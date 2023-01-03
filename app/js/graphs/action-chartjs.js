@@ -1,0 +1,660 @@
+"use strict";
+
+// colores sacados de chart.
+
+/**
+ *
+ * Genera un gráfico Chartjs contra el tiempo, este gráfico se llama al cliquear la opción en una barra de la topología..
+ *
+ * @param canvas Donde se dibujara el gráfico. HTML object.
+ * @param selectedElement
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param PDTO Abstracción de los datos de etiquetado del gráfico del nodo cliqueado.
+ * @param nodeName Nombre del nodo (elemento de grafo) desde el cual se obtendran los dato a graficar. En este caso es una barra.
+ */
+function generateBusChart(canvas, selectedElement, type, PDTO, nodeName) {  // PDTO === Plotable DataType Object Esta función recibe datos y genera un grafico con ellos en el canvas
+  let xAxis = PDTO.idX;
+  let yAxis = PDTO.idY;
+	let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
+	canvas.attr("id","canvas_" + containerID);
+  let row = canvas.parent().parent();
+  canvas.attr("id", "row_" + containerID);
+
+  let title = "H1"; // Título en negritas del gráfico.
+  let newColor = randomColor();
+  let bkgCol= newColor; // Color de la línea,
+  let bdrCol= newColor; // Color del borde de la línea,
+  let lblStrX= PDTO.labelX + " " + PDTO.unitX; // Etiqueta del eje x
+  let lblStrY= PDTO.labelY + " " + PDTO.unitY; // Etiqueta del eje y
+  let txt = PDTO.title + " en la barra " + nodeName; // Título del dataset correspondiente.
+
+  let result = loadFunctions(canvas, title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, 'bus', 'buses');
+
+  /* se cargan los datos y si existen se crea el gráfico. */
+  loadTypeFile(selectedElement, result.pl , result.cb, chosenHydrology, 'buses');
+}
+
+/**
+ *
+ * Genera un gráfico Chartjs de línea, según los parametros entregados.
+ * En esta función especificamente se genera el gráfico de los flujos en el tiempo de una línea de transmisión.
+ *
+ * @param canvas Elemento HTML donde se dibujara el gráfico. HTML object.
+ * @param elementObj Objeto sobre el cual se busca
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param PDTO Datos asociados con el gráfico
+ * @param fromName Nodo de inicio de la línea (referencia)
+ * @param toName Nodo final de la línea (referencia)
+ * @param hydroNum Numero de la hidrologia desde donde se agregaran datos
+
+ */
+function generateLineChart(canvas, elementObj, type, PDTO, fromName, toName, hydroNum) {
+  let xAxis = PDTO.idX;
+  let yAxis = PDTO.idY;
+  var containerID = 'chart' + elementObj.lineNumber + '-' + xAxis + '-' + yAxis;
+
+  canvas.id = "canvas_" + containerID;
+  var row = canvas.parent().parent();
+  row.id = "row_" + containerID;
+
+  if( chosenHydrology == null) chosenHydrology = 1;
+  var title = "H" + chosenHydrology;
+  var bkgCol = 'rgb(255, 99, 132)';
+  var bdrCol = 'rgb(255, 99, 132)';
+  var lblStrX = 'Tiempo [horas]';
+  var lblStrY= 'Flujo [MW]';
+  var txt='Flujo en la línea ' + fromName + "->" + toName;
+
+  let result = loadFunctions(canvas, title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, elementObj.id, PDTO, 'line', 'lines');
+
+  /* se cargan los datos y si existen se crea el gráfico. */
+  loadTypeFile(elementObj.lineNumber, result.pl , result.cb, chosenHydrology, 'lines');
+}
+
+/**
+ * Aquí se crean las dos funciones que se ejecutaran en caso de leer de un archivo o que los datos esten previamente cargados.
+ * @param canvas Donde se dibujara el gráfico. HTML object.
+ * @param title Título del gráfico
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param bkgCol Color de fondo del gráfico
+ * @param bdrCol Color de borde del gráfico
+ * @param txt Texto descriptivo del gráfico sirve como subtítulo y entrega detalle de lo graficado
+ * @param lblStrX Etiqueta del eje X
+ * @param lblStrY Etiqueta del eje Y
+ * @param xAxis Llave de los datos del eje X en los datos (diccionario)
+ * @param yAxis Llave de los datos del eje Y en los datos (diccionario)
+ * @param selectedElement Elemento seleccionado
+ * @param PDTO Abstracción de los datos de etiquetado del gráfico
+ * @param category categoría del objeto a graficar (barra, linea)
+ * @param kind El tipo de elemento a graficar (por ejemplo, buses o lineas)
+ * @returns {{cb: callBack, pl: preLoad}}
+ */
+function loadFunctions(canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category, kind){
+
+  /* Se cargan los datos de la barra seleccionada. */
+  let callBack = function (x) {
+    return function() {
+      if (x.readyState === 4){
+        let busData = JSON.parse(x.responseText);
+
+        if(!(selectedElement in hydrologyTimes[chosenHydrology][kind])) {
+          hydrologyTimes[chosenHydrology][kind][selectedElement] = busData;
+        }
+
+        setUpData(busData, canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category);
+      }
+    };
+  };
+
+  /* Si los datos estan cargados se ejecuta este método. */
+  let preLoad = function (data) {
+    setUpData(data, canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category);
+  };
+
+  return {cb: callBack, pl: preLoad}
+}
+
+/**
+ *
+ * @param canvas Donde se dibujara el gráfico. HTML object.
+ * @param selectedElement Elemento seleccionado.
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param PDTO Abstracción de los datos de etiquetado en el gráfico generado.
+ * @param centralName Nombre del generador
+ * @param centralType Tipo de generador
+ * @param hydro Número de la hidrología
+ */
+function generateGenerationChart(canvas, selectedElement, type, PDTO, centralName, centralType, hydro) {
+	
+	console.log(selectedElement);
+  let xAxis = PDTO.idX;
+  let yAxis = PDTO.idY;
+  let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
+
+  canvas.id = "canvas_" + containerID;
+  let row = canvas.parent().parent();
+  row.id = "row_" + containerID;
+
+  if( chosenHydrology == null) chosenHydrology = 1;
+  console.log(chosenHydrology); 
+  let title = "H" + chosenHydrology;
+  let colorBkg;
+  
+  switch(centralType) {
+	case "Serie":
+		colorBkg = CONFIG.COLOR_SERIE;
+		break;
+	case "Embalse":
+		colorBkg = CONFIG.COLOR_EMBALSE;
+		break;
+	case "Pasada":
+		colorBkg = CONFIG.COLOR_PASADA;
+		break;
+	case "Minihidro":
+		colorBkg = CONFIG.COLOR_MINIHIDRO;
+		break;
+	case "Solar":
+		colorBkg = CONFIG.COLOR_SOLAR;
+		break;
+	case "Eolica":
+		colorBkg = CONFIG.COLOR_EOLICA;
+		break;
+	case "Carbon":
+		colorBkg = CONFIG.COLOR_CARBON;
+		break;
+	case "Diesel":
+		colorBkg = CONFIG.COLOR_DIESEL;
+		break;
+	case "GNL":
+		colorBkg = CONFIG.COLOR_GNL;
+		break;
+	case "Biomasa":
+		colorBkg = CONFIG.COLOR_BIOMASA;
+		break;
+	case "Cogeneracion":
+		colorBkg = CONFIG.COLOR_COGENERACION;
+		break;
+	default:
+    colorBkg = randomColor();
+  }
+  
+  
+  
+  let colorBrd = colorBkg;
+  var lblStrX = 'Tiempo [horas]';
+  var lblStrY= 'Generación [MW]';
+  var txt='Generación en la central: ' + centralName;
+
+
+  var node = electricNodes.get(selectedElement);
+  let result = loadFunctions(canvas, title, type, colorBkg, colorBrd, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, 'central', 'centrals');
+
+  /* se cargan los datos y si existen se crea el gráfico. */
+  loadTypeFile(node.centralId, result.pl , result.cb, hydro, 'centrals');
+}
+
+
+/**
+ *
+ * Este método genera un gŕafico apilado de las generaciones en las centrales de una barra seleccionada.
+ *
+ * @param canvas Elemento HTML donde se dibujara el gráfico. HTML object.
+ * @param selectedElement Elemento seleccionado (objeto) desde el gráfico
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param xAxis Llave de los valores del eje X desde datos (diccionario).
+ * @param yAxis Llave de los valores del eje Y desde datos (diccionario).
+ * @param centrals Arreglo de generadores asociados a una barra
+ * @param busName Nombre de la barra de la cual se graficaran los datos de generacion de energia
+ * @param hydroNum Numero de la hidrologia desde donde se agregaran datos
+ */
+function generatePiledGraph(canvas, selectedElement, type, PDTO, centrals, busName) {
+
+  let xAxis = PDTO.idX;
+  let yAxis = PDTO.idY;
+  var containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
+
+  canvas.id = "canvas_" + containerID;
+  var row = canvas.parent().parent();
+  row.id = "row_" + containerID;
+
+  var  lblStrX="Tiempo [hora]";
+  var  lblStrY="Generación [MW]";
+  var centralsData = {};
+
+  var setDeDatos = [];
+  var xlabel = [];
+
+  for (var i = 0; i < centrals.length; i++) {
+  	try {
+      var chartReq = new XMLHttpRequest();
+      chartReq.onreadystatechange = createCallback(chartReq, centrals[i].tipo, centralsData, yAxis);
+      chartReq.open("GET", CONFIG.CENTRALS_FOLDER +
+          "central_" + centrals[i].centralId + ".json", false);
+      chartReq.send();
+    } catch (e) {
+      createLog("El generador " +  centrals[i].centralId + " no tiene archivo de resultados.", LOG_TYPE.ERROR)
+		}
+	}
+    //addDataSets(centralsData);
+    addDataSets(centralsData, xAxis, yAxis, setDeDatos, xlabel);
+    setUpChart(canvas, xlabel, type, setDeDatos, 'Generación en la barra ' + busName, lblStrX, lblStrY, selectedElement, PDTO);
+}
+
+
+/**
+ *
+ * Este método genera un gŕafico apilado de las generaciones de todo el sistema.
+ *
+ * @param canvas Elemento HTML donde se dibujara el gráfico. HTML object.
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param PDTO Datos asociados con el gráfico
+ * @param hydroNum Numero de la hidrologia desde donde se agregaran datos
+ */
+function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
+
+  let xAxis = PDTO.idX;
+  let yAxis = PDTO.idY;
+  let containerID = 'chart' + '-Sistema' + '-' + xAxis + '-' + yAxis;
+
+  canvas.id = "canvas_" + containerID;
+  let row = canvas.parent().parent();
+  row.id = "row_" + containerID;
+
+  let  lblStrX="Tiempo [bloques]";
+  let  lblStrY="Generación [MW]";
+  let centralsData = {};
+
+  let setDeDatos = [];
+  let xlabel = [];
+
+  let centrals = currentNodes.get({
+    filter: function (item) {
+      return (item.category === 'central');
+    }
+  });
+
+  /* Se cargan los datos de la barra seleccionada. */
+  let callBack = function(m, id) {
+    return function (x) {
+      return function() {
+        if (x.readyState === 4){
+
+          const cData = JSON.parse(x.responseText);
+
+          if(!(id in hydrologyTimes[chosenHydrology]['centrals'])) {
+            hydrologyTimes[chosenHydrology]['centrals'][id] = cData;
+          }
+
+          addCentralData(cData, m, centralsData, yAxis);
+        }
+      };
+    }
+  };
+
+  /* Si los datos estan cargados se ejecuta este método. */
+  let preLoad = function (m) {
+    return function (data) {
+      addCentralData(data, m, centralsData, yAxis);
+    }
+  };
+
+  for (let i = 0; i < centrals.length; i++) {
+    /* se cargan los datos y si existen se crea el gráfico. */
+    loadTypeFile(centrals[i].centralId, preLoad(centrals[i].tipo), callBack(centrals[i].tipo, centrals[i].centralId), hydroNum, 'centrals');
+  }
+
+  //addDataSets(centralsData);
+  addDataSets(centralsData, xAxis, yAxis, setDeDatos, xlabel);
+  setUpChart(canvas, xlabel, type, setDeDatos, 'Generación del sistema', lblStrX, lblStrY, 'Sistema', PDTO);
+}
+
+
+/**
+ *
+ * Genera un gráfico Chartjs de línea, este método genera un gráfico de línea de los niveles de un embalse en los tiempos dados.
+ *
+ * @param canvas Elemento HTML donde se dibujara el gráfico. HTML object.
+ * @param selectedElement Elemento seleccionado (objeto) desde el gráfico.
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param PDTO Datos asociados con el gráfico
+ * @param reservoirName Nombre de embalse al cual se quiere graficar nivel
+ * @param reservoirId ID del embalse
+ */
+function generateLevelChart(canvas, selectedElement, type, PDTO, reservoirName, reservoirId) {
+  let xAxis = PDTO.idX;
+  let yAxis = PDTO.idY;
+  let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
+
+  canvas.id = "canvas_" + containerID;
+  let row = canvas.parent().parent();
+  row.id = "row_" + containerID;
+
+  let title = "H" + chosenHydrology;
+  let bkgCol = 'rgba(75, 192, 192, 1)';
+  let bdrCol = 'rgba(75, 192, 192, 1)';
+  let lblStrX="Tiempo [bloques]";
+  let lblStrY="Nivel [msnm]";
+  let txt = "Cota en el embalse " + reservoirName;
+
+  /* se cargan los datos y si existen se crea el gráfico. */
+  var node = hydricNodes.get(selectedElement);
+
+  let result = loadFunctions(canvas, title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, 'reservoir', 'reservoirs');
+
+  /* se cargan los datos y si existen se crea el gráfico. */
+  loadTypeFile(node.reservoirId, result.pl , result.cb, chosenHydrology, 'reservoirs');
+
+}
+
+/**
+ *
+ * Este método genera un gráfico Chartjs de línea. Genera un gráfico agregado de los flujos que llegan a una barra dada.
+ *
+ * @param canvas Elemento HTML donde se dibujara el gráfico. HTML object.
+ * @param selectedElement Elemento seleccionado desde
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param xAxis Llave de los valores del eje X desde datos (diccionario).
+ * @param yAxis Llave de los valores del eje Y desde datos (diccionario).
+ * @param edges Aristas desde la barra hacia los generadores a los que está conectada.
+ * @param busName Nombre de la barra de la cula se grafican los flujos.
+ * @param busId Identificador de la barra a graficar
+ */
+function generateFlowBusChart(canvas, selectedElement, type, PDTO, edges, busName, busId) {
+
+  let xAxis = PDTO.idX;
+  let yAxis = PDTO.idY;
+
+  let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
+
+  canvas.id = "canvas_" + containerID;
+  let row = canvas.parent().parent();
+  row.id = "row_" + containerID;
+
+  let title = 'H' + chosenHydrology;
+  let bkgCol = 'rgb(255, 99, 132)';
+  let bdrCol = 'rgb(255, 99, 132)';
+  let lblStrX="Tiempo [bloques]";
+  let lblStrY="Flujo [MW]";
+  let txt = "Flujos hacia la barra " + busName ;
+
+  setUpData(setUpFlowData(edges, busId, chosenHydrology), canvas, title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY,
+    xAxis, yAxis, busId, PDTO, 'bus-flow');
+
+}
+
+/**
+ * Setea los datos necesarios para que se grafiquen los flujos hacia una barra dada una hidrología.
+ * @param edges aristas del grafo actual
+ * @param busId identificador del bus
+ * @param currentHydrology  hidrología de donde se obtendrán los datos.
+ * @returns {Array} arreglo con el dataset
+ */
+function setUpFlowData(edges, busId, currentHydrology){
+
+  let flowData = [];
+  busId = parseInt(busId);
+
+  let lines = edges.get({
+    filter: function (item) {
+      return ((item.to === busId || item.from === busId) && item.category === 'bus-to-bus');
+    }
+  });
+
+  function lineTimeCallback(x, id) {
+    return function() {
+      if (x.readyState === 4){
+        hydrologyTimes[currentHydrology].lines[id] = JSON.parse(x.responseText);
+      }
+    };
+  }
+
+
+  for (let i = 0; i < lines.length; i++) {
+    checkHydrologyTimes(currentHydrology);
+    if(!(lines[i].lineNumber in hydrologyTimes[currentHydrology].lines)) {
+      try {
+        let chartReq = new XMLHttpRequest();
+        chartReq.onreadystatechange = lineTimeCallback(chartReq, lines[i].lineNumber);
+        chartReq.open("GET", CONFIG.LINES_FOLDER + "line_" + lines[i].lineNumber + ".json", false);
+        chartReq.send();
+      } catch (e) {
+        console.log("La línea: " + lines[i].lineNumber + " no tiene archivo de resultados.")
+      }
+    }
+
+    let currentFlowData = hydrologyTimes[currentHydrology].lines[lines[i].lineNumber];
+
+    if (flowData.length <= 0) {
+      console.log(currentFlowData);
+      for (let j = 0; j < currentFlowData.length; j++){
+        flowData[j] = {time: j + 1, flow: currentFlowData[j].flow};
+      }
+    } else {
+      for (let j = 0; j < currentFlowData.length; j++){
+        flowData[j].flow += currentFlowData[j].flow; // Flujo agregado.
+      }
+    }
+
+    console.log(flowData[0].flow);
+  }
+
+  return flowData;
+}
+
+
+/**
+ * Crea el canvas de dibujo de los gráficos
+ * @param elementID identificador del elemento de la topología que se quiere graficar
+ * @param PDTO objeto que representa los tipos de dato graficables
+ * @returns {DOM} canvas HTML para dibujar el gráfico
+ */
+function createCanvas(elementID, PDTO) { // PDTO === Plotable DataType Object
+	// Esta función crea un nuevo div row para poner el nuevo gráfico y lo inserta en la pantalla
+	// Retorna el canvas
+
+	let charts = $('#charts');
+	
+
+  let chartRowDiv = $('<div>');
+
+  let chartGraphDiv = $('<div>');
+
+  let chartCanvas = $('<canvas>')
+                       .addClass("mychart");
+
+  chartGraphDiv.append(chartCanvas);
+  chartRowDiv.append(chartGraphDiv);
+  createChartMenu(chartRowDiv, elementID, PDTO);
+
+  charts.prepend(chartRowDiv);
+
+  return chartCanvas;
+
+}
+
+/**
+ * Crea menu de cada grafico (boton de eliminacion, exportacion en PNG..)
+ * @param row Fila en elemento HTML donde se ubicara el grafico generado
+ * @param elementID ID del elemento a graficar
+ * @param PDTO Abstracción de los datos de etiquetado del gráfico
+ */
+function createChartMenu(row, elementID, PDTO) {
+  var chartMenu = $('<div>').addClass("chart-menu");
+
+  let tsel = $('<div>')
+              .addClass("time-select");
+  chartMenu.append(tsel);
+  
+  /*Start selector*/
+  let tsel_start = $('<select>')
+                    .attr("data-placeholder", "Tiempo inicial")
+                    .addClass("chosen")
+                    .addClass("hydro-select")
+                    .attr("width","50%")
+                    .attr("id", (PDTO.print()).replace(/ /gi,"-").normalize() + "-" + elementID + "-start");
+  tsel.append(tsel_start);
+
+  /*End selector*/
+  let tsel_end = $('<select>')
+                  .attr("data-placeholder", "Tiempo final")
+                  .addClass("chosen")
+                    .addClass("hydro-select")
+                  .attr("width","50%")
+                  .attr("id", (PDTO.print()).replace(/ /gi,"-").normalize() + "-" + elementID + "-end");
+  tsel.append(tsel_end);
+
+  // Selector de hidrología
+  let hsel = $('<select>')
+              .attr("data-placeholder", "Hidrologías")
+              .attr("multiple", true)
+              .addClass("chosen")
+              .addClass("hydro-select")
+              .attr("tabindex", "4")
+              .attr("id", (PDTO.print()).replace(/ /gi,"-").normalize() + "-" + elementID);
+
+  var opt = $('<option>');
+  opt.val("");
+  hsel.append(opt);
+
+  for (var i = 0; i < hydrologyList.length; i++) {
+    var opt = $('<option>').attr("value", hydrologyList[i]);
+    if(hydrologyList[i] === chosenHydrology)
+      opt.attr("selected", true);
+    opt.html(hydrologyList[i]);
+    hsel.append(opt);
+  }
+  chartMenu.append(hsel);
+
+  hsel.chosen({ disable_search_threshold: 10, width: "25%"});
+
+  //Botones
+  var buttons = $('<span>');
+  chartMenu.append(buttons);
+
+  // Boton de exportar csv
+  var csv = $('<a>')
+            .addClass("chartmenu-button")
+            .addClass("exp-button")
+            .attr("style", "cursor: pointer;")
+            .attr("id", (PDTO.print()).replace(/ /gi,"-").normalize() + "-" + elementID + "-csv");
+
+  var csv_img = $('<img>')
+                .attr("src", "resources/chart/menu/export-csv.svg")
+                .attr("height", 14)
+                .attr("width", 14);
+  csv.append(csv_img);
+  buttons.append(csv);
+  
+   // Boton de exportar grafico
+  var exp = $('<a>')
+            .addClass("chartmenu-button")
+            .addClass("exp-button")
+            .attr("style", "cursor: pointer;")
+            .attr("download", "chart.png");
+  exp.click(function() {
+  	let containerID = row.id.substring(4);
+    let mycanvas = document.getElementById('canvas_' + containerID);
+    let url = mycanvas.toDataURL();
+    this.attr(href,url);
+  });
+  var exp_img = $('<img>')
+                .attr("src", "resources/chart/menu/export.svg")
+                .attr("height", 14)
+                .attr("width", 14);
+  exp.append(exp_img);
+  buttons.append(exp);
+
+  // Boton de arrastrar grafico
+  var move = $('<span>').append(
+              $('<img>').addClass("chartmenu-button") 
+              .attr("src", "resources/chart/menu/move.svg")
+              .attr("height", 14)
+              .attr("width", 14))
+            .addClass("move-button");
+  buttons.append(move);
+
+  // Boton de eliminar grafico
+  var quit = $('<img>') 
+            .addClass("chartmenu-button")
+            .addClass("quit-button")
+            .attr("src", "resources/chart/menu/remove.svg")
+            .attr("height", 14)
+            .attr("width", 14);
+  quit.click(function(){
+    let row = quit.parent().parent().parent();
+    row.remove();
+  });
+  buttons.append(quit);
+
+  row.prepend(chartMenu);
+}
+
+
+/**
+ * Esto es para la biblioteca Chartjs no dibuje fuera de los ejes.
+ */
+Chart.plugins.register({
+  beforeDatasetsDraw: function(chartInstance) {
+    var ctx = chartInstance.chart.ctx;
+    var chartArea = chartInstance.chartArea;
+    ctx.save();
+    ctx.beginPath();
+
+    ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+    ctx.clip();
+  },
+  afterDatasetsDraw: function(chartInstance) {
+    chartInstance.chart.ctx.restore();
+  },
+});
+
+/**
+ * Genera gráfico apilado de generación del sistema.
+ */
+function showSystemStackedChart(){
+  const pdto = new PlotableDataType(
+    "Generación de la barra",
+    "Tiempo",
+    "Generación",
+    "[hora]",
+    "[MW]",
+    "time",
+    "CenPgen"
+  );
+
+  let mycanvas = createCanvas('Sistema', pdto);
+  generateSystemPiledGraph(mycanvas, 'line', pdto, chosenHydrology);
+
+}
+
+/**
+ * Cambia el numero de columnas donde se visualizan los gráficos con tal de aumentar la cantidad de estos
+ * en la ventana de programa.
+ */
+function changeChartNumberOfColumns() {
+    let charts = $("#charts");
+    let select = $("#chart-column-number");
+    let value = select.val();
+    console.log(charts.attr("class"));
+    for (var i = 1; i <= 3; i++) {
+        charts.removeClass("columns-" + i);
+    }
+    
+    charts.addClass("columns-" + value);
+    
+    $(window).trigger('resize');
+
+}
+
+$(() => {
+  var charts = $("#charts")
+  // Hace editable la lista de graficos
+  var SortableList = charts.sortable( {
+    handle: '.move-button'
+  });
+  console.log("Sortabled");
+})
+
+jQuery("#chart-column-number").chosen({ disable_search_threshold: 10, width: "100%" });
+
+logTime("action-chartjs.js");

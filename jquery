@@ -1,0 +1,6 @@
+M	app/app.html
+M	app/css/chartjs.css
+M	app/js/graphs/action-chartjs.js
+M	app/js/graphs/single-chart.js
+M	app/js/graphs/stacked-charts.js
+M	app/js/network/events-visjs.js
