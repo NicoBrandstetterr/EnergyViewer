@@ -133,7 +133,7 @@ function loadLineFile(lineID, hydro, noLineResultsLog){
   if(!(lineID in hydrologyTimes[hydro].lines)) {
     try {
       // Mandamos la petición vía get.
-      lineReq.open("GET", getUrlByHydrology('lines', hydro) + getTypeToFileString('lines') + lineID + ".json", false);
+      lineReq.open("GET", getUrlByHydrology('lines', hydro) + getTypeToFileString('lines') + lineID + ".json", true);
       lineReq.send();
     } catch (err) {
       if (noLineResultsLog.length === 0) {
