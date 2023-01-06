@@ -17,7 +17,7 @@ function getFiles(){
  * Muestra archivos
  */
 function showFiles(){
-    console.log(getFiles("./data/CHL"));
+    // console.log(getFiles("./data/CHL"));
 }
 
 /**
