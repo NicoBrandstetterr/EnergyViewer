@@ -5,32 +5,6 @@
  */
 
 
-/**
- * Estructura que guarda todos los datos de los resultados, las llaves son las hidrologías y estas a su vez
- * son diccionarios que contienen como llaves los tipos de datos asociados.
- */
-
-
-/*var bReq = new XMLHttpRequest();
-
-
-bReq.onreadystatechange = function () {
-  if (this.readyState === 4) {
-    hydrologyList = JSON.parse(this.responseText);
-    if (hydrologyList.length > 0) {
-      chosenHydrology = hydrologyList[0];
-      loadLinesFiles();
-      buildDropdownHydrology();
-    }
-  }
-};
-
-try {
-  bReq.open("GET", CONFIG.URL_HYDROLOGIES, false);
-  bReq.send();
-} catch(e) {
-  console.log("No está el archivo con la lista de hidrologías existentes.");
-}*/
 
 let hydrologyTimes = {};
 loadHydrologies();
@@ -48,7 +22,6 @@ function loadHydrologies(){
       if (req.readyState === 4) {
         hydrologyList = JSON.parse(req.responseText); // guarda la lista
         if (hydrologyList.length > 0) {
-          hydrologyTimes={}
           chosenHydrology = hydrologyList[0];
           CONFIG.BUSES_FOLDER = CONFIG.BUSES_FOLDER.formatUnicorn({hydrology:chosenHydrology});
           CONFIG.CENTRALS_FOLDER = CONFIG.CENTRALS_FOLDER.formatUnicorn({hydrology:chosenHydrology});
@@ -89,7 +62,7 @@ tReq.onreadystatechange = function () {
 /**
  * Función que carga todos los archivos de resultado de las líneas de la actual hidrología.
  */
-async function loadLinesFiles(){
+function loadLinesFiles(){
   if(typeof lines === 'undefined') return;
 
   // Esto solo revisa si la estructura fue creada.
@@ -97,12 +70,9 @@ async function loadLinesFiles(){
 
   let noLineResultsLog = [];
   
-  // for (let i = 0; i < lines.length; i++) {
-  //     loadLineFile(lines[i].id, chosenHydrology, noLineResultsLog);
-  // }
-  lines.forEach(async function(line) {
-    await loadLineFile(line.id, chosenHydrology, noLineResultsLog);
-  });
+  for (let i = 0; i < lines.length; i++) {
+      loadLineFile(lines[i].id, chosenHydrology, noLineResultsLog);
+  }
 }
 
 /**
@@ -111,57 +81,38 @@ async function loadLinesFiles(){
  * @param lineID identificador de la línea.
  * @param hydro hidrología del resultado a leer.
  */
-// function loadLineFile(lineID, hydro, noLineResultsLog){
+function loadLineFile(lineID, hydro, noLineResultsLog){
 
-//   // Método que se usa al cargar correctamente el archivo, guarda los datos si no fueron previamente cargados.
-//   let lineOnLoad = function(req, hydrology){
-//     return function() {
-//       if (req.readyState === 4){
-//         let lineData = JSON.parse(req.responseText);
-
-//         // Siempre debería entrar aquí.
-//         if(!(lineID in hydrologyTimes[hydrology].lines)) {
-//           hydrologyTimes[hydrology].lines[lineID] = lineData;
-//         }
-//       }
-//     };
-//   };
-
-//   // Creamos una petición.
-//   let lineReq = new XMLHttpRequest();
-
-//   // En caso de cambiar de estados usamos el método lineOnLoad.
-//   lineReq.onreadystatechange = lineOnLoad(lineReq, hydro);
-
-//   // En caso de que los datos no estén cargados, cargamos el archivo de la línea.
-//   if(!(lineID in hydrologyTimes[hydro].lines)) {
-//     try {
-//       // Mandamos la petición vía get.
-//       lineReq.open("GET", getUrlByHydrology('lines', hydro) + getTypeToFileString('lines') + lineID + ".json", false);
-//       lineReq.send();
-//     } catch (err) {
-//       if (noLineResultsLog.length === 0) {
-// 		  noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
-// 	  }
-async function loadLineFile(lineID, hydro, noLineResultsLog) {
   // Método que se usa al cargar correctamente el archivo, guarda los datos si no fueron previamente cargados.
-  let lineOnLoad = function(lineData, hydro) {
-    if (!(lineID in hydrologyTimes[hydro].lines)) {
-      hydrologyTimes[hydro].lines[lineID] = lineData;
-    }
+  let lineOnLoad = function(req, hydrology){
+    return function() {
+      if (req.readyState === 4){
+        let lineData = JSON.parse(req.responseText);
+
+        // Siempre debería entrar aquí.
+        if(!(lineID in hydrologyTimes[hydrology].lines)) {
+          hydrologyTimes[hydrology].lines[lineID] = lineData;
+        }
+      }
+    };
   };
 
+  // Creamos una petición.
+  let lineReq = new XMLHttpRequest();
+
+  // En caso de cambiar de estados usamso el método lineOnLoad.
+  lineReq.onreadystatechange = lineOnLoad(lineReq, hydro);
+
   // En caso de que los datos no estén cargados, cargamos el archivo de la línea.
-  if (!(lineID in hydrologyTimes[hydro].lines)) {
+  if(!(lineID in hydrologyTimes[hydro].lines)) {
     try {
       // Mandamos la petición vía get.
-      let response = await fetch(getUrlByHydrology('lines', hydro) + getTypeToFileString('lines') + lineID + ".json");
-      let lineData = await response.json();
-      lineOnLoad(lineData, hydro);
+      lineReq.open("GET", getUrlByHydrology('lines', hydro) + getTypeToFileString('lines') + lineID + ".json", false);
+      lineReq.send();
     } catch (err) {
       if (noLineResultsLog.length === 0) {
-        noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
-      }
+		  noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
+	  }
 	  addDetailsToLog(noLineResultsLog[0], "Línea ID: "+lineID);
     }
   }

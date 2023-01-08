@@ -85,15 +85,25 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
           "time",
           "marginal_cost"
         ),
-      "Demanda":
+      "Demanda E":
         new PlotableDataType(
-          "Gráfico de demanda",
+          "Gráfico de demanda de Energía",
           "Tiempo",
-          "Demanda",
+          "DemandaE",
           "[Bloques]",
           "[MWh]",
           "time",
-          "BarRetP"
+          "DemBarE"
+        ),
+      "Demanda P":
+        new PlotableDataType(
+          "Gráfico de demanda de Potencia",
+          "Tiempo",
+          "DemandaP",
+          "[Bloques]",
+          "[MW]",
+          "time",
+          "DemBarP"
         ),
       "Flujos":
         new PlotableDataType(
@@ -242,7 +252,7 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
   });
 
 
-  // Al terminar un drag, si es ue estaba moviendo un nodo, avisa que hay cambios sin guardar
+  // Al terminar un drag, si es que estaba moviendo un nodo, avisa que hay cambios sin guardar
   network.on("dragEnd", function(params) {
     if (params.nodes.length > 0) {
       unsavedChanges = true;

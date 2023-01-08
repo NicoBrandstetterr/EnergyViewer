@@ -388,12 +388,15 @@ function getCentralsUpdates() {
         }
     }
     
+    let capacity = parseFloat(inodes[i].capacity).toFixed(2);
+    let maxPower = parseFloat(inodes[i].max_power).toFixed(2);
+    let currentGeneration = parseFloat(currentCentralTime.CenPgen).toFixed(2);
+
     let tooltip = generateTooltip(["Generador: " + inodes[i].nodeName,
                                     "Tipo: " + inodes[i].tipo,
-                                    "Capacidad: " + parseFloat(inodes[i].capacity).toFixed(2) + " [MW]",
-                                    "Generación máxima: " + parseFloat(inodes[i].max_power).toFixed(2) + " [MW]",
-                                    "Generación actual: " + parseFloat(currentCentralTime.CenPgen).toFixed(2) + " [MW]"]);
-
+                                    "Capacidad: " + capacity + " [MW]",
+                                    "Generación máxima: " + maxPower + " [MW]",
+                                    "Generación actual: " + currentGeneration + " [MW]"]);
     let generador =
       {
         id: inodes[i].id,

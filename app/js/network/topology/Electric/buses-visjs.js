@@ -70,7 +70,8 @@ function parseBuses(buses, electricTopology, type) {
 
     var currentBusTime = {
       marginal_cost: 'undefined',
-      BarRetP: 'undefined'
+      DemBarE: 'undefined',
+      DemBarP: 'undefined'
     };
     
     // Agregamos la barra al diccionario para linkearla a sus generadores.
@@ -94,7 +95,8 @@ function parseBuses(buses, electricTopology, type) {
       shape: 'image',
 	    size: 40,
       marginal_cost: currentBusTime.marginal_cost,
-      demand: currentBusTime.BarRetP,
+      demandE: currentBusTime.DemBarE,
+      demandP: currentBusTime.DemBarP,
       maxSize: 40,
       // Variables relacionadas con lo que son las barras.
       category: 'bus',
@@ -227,7 +229,8 @@ function getNodesUpdates(){
 
     let currentBusTime = {
       marginal_cost: 0,
-      BarRetP: 0
+      DemBarE: 0,
+      DemBarP: 0
     };
 
 
@@ -278,13 +281,15 @@ function getNodesUpdates(){
     let tooltip = generateTooltip(["Barra: " + inodes[i].nodeName.replace(/_/gi, " "), 
                                   "Activo: " + active, 
                                   "Costo marginal: " + parseFloat(currentBusTime.marginal_cost).toFixed(2) + " [USD/MWh]", 
-                                  "Demanda: " + parseFloat(currentBusTime.BarRetP).toFixed(2) + " [MWh]"]);
+                                  "DemandaE: " + parseFloat(currentBusTime.DemBarE).toFixed(2) + " [MWh]",
+                                  "DemandaP: " + parseFloat(currentBusTime.DemBarP).toFixed(2) + " [MW]"]);
 
     let node = {
       id: inodes[i].id,
       title: tooltip,
       marginal_cost: currentBusTime.marginal_cost,
-      demand: currentBusTime.BarRetP
+      demandE: currentBusTime.DemBarE,
+      demandP: currentBusTime.DemBarP
     };
 	
 		const configSelected = {
@@ -321,7 +326,8 @@ function getNodesUpdates(){
 		  };
 		  
     inodes[i].marginal_cost = currentBusTime.marginal_cost;
-    inodes[i].demand = currentBusTime.BarRetP;
+    inodes[i].demandE = currentBusTime.DemBarE;
+    inodes[i].demandP = currentBusTime.DemBarP;
     inodes[i].title = tooltip;
 
     updates.push(node);
@@ -359,7 +365,7 @@ function getBusLoad(busID){
         }
 
         for(let i = 0; i < busData.length; i++){
-          if(parseFloat(busData[i]["BarRetP"]) > 0){
+          if(parseFloat(busData[i]["DemBarE"]) > 0 || parseFloat(busData[i]["DemBarP"]) > 0){
             busLoad = true;
             break;
           }
@@ -371,7 +377,7 @@ function getBusLoad(busID){
   /* Si los datos estan cargados se ejecuta este método. */
   let preLoad = function (data) {
     for(let i = 0; i < data.length; i++){
-      if(parseFloat(data[i]["BarRetP"]) > 0){
+      if(parseFloat(data[i]["DemBarE"]) > 0 || parseFloat(data[i]["DemBarP"]) > 0){
         busLoad = true;
         break;
       }
