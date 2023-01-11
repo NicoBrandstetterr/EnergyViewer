@@ -17,7 +17,7 @@ var electricMapTopology = {
 };
 
 function loadElectricTopology(buses, lines, centrals){
-
+  console.log("pasando por loadElectricTopology")
   // Parseamos las variables recibidas.
   parseBuses(buses, electricTopology, TOPOLOGY_TYPES.ELECTRIC);
   parseBuses(buses, electricMapTopology, TOPOLOGY_TYPES.GEO);
@@ -30,7 +30,7 @@ function parseElectricTopologyToNetwork(){
 
  // nodesArray = [];
  // edgesArray = [];
-
+  console.log("pasando por parseElectricTopologyToNetwork")
   addBusesToNetwork(electricTopology.buses);
   addLinesToNetwork(electricTopology.lines);
   addCentralsToNetwork(electricTopology.centrals);
@@ -67,7 +67,7 @@ function parseElectricTopologyToNetwork(){
 }
 
 function addDataToMapNetwork(){
-
+  console.log("pasando por addDataToMapNetwork")
   addBusesToMapNetwork(electricMapTopology.buses);
   addLinesToMapNetwork(electricMapTopology.lines);
   addCentralsToMapNetwork(electricMapTopology.centrals);

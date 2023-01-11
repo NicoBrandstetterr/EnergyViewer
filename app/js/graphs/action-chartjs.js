@@ -208,7 +208,7 @@ function generateGenerationChart(canvas, selectedElement, type, PDTO, centralNam
  * @param hydroNum Numero de la hidrologia desde donde se agregaran datos
  */
 function generatePiledGraph(canvas, selectedElement, type, PDTO, centrals, busName) {
-
+  console.log("pasando por gerenatePiledGraph")
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
   var containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
@@ -251,7 +251,7 @@ function generatePiledGraph(canvas, selectedElement, type, PDTO, centrals, busNa
  * @param hydroNum Numero de la hidrologia desde donde se agregaran datos
  */
 function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
-
+  console.log("pasando por generateSystemPiledGraph en modulo action-chartjs")
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
   let containerID = 'chart' + '-Sistema' + '-' + xAxis + '-' + yAxis;
@@ -297,13 +297,15 @@ function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
       addCentralData(data, m, centralsData, yAxis);
     }
   };
-
+  console.log("Cargando datos y si es que existen crando grafico usando funciones addCentralData y loadTypeFile")
   for (let i = 0; i < centrals.length; i++) {
     /* se cargan los datos y si existen se crea el gráfico. */
+    // console.log("Mostrando datos centrals[i]: ", centrals[i])
     loadTypeFile(centrals[i].centralId, preLoad(centrals[i].tipo), callBack(centrals[i].tipo, centrals[i].centralId), hydroNum, 'centrals');
   }
 
   //addDataSets(centralsData);
+  console.log("Se presenta, previo a addDataSets, los valores yAxis: ", typeof yAxis)
   addDataSets(centralsData, xAxis, yAxis, setDeDatos, xlabel);
   setUpChart(canvas, xlabel, type, setDeDatos, 'Generación del sistema', lblStrX, lblStrY, 'Sistema', PDTO);
 }
@@ -321,6 +323,8 @@ function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
  * @param reservoirId ID del embalse
  */
 function generateLevelChart(canvas, selectedElement, type, PDTO, reservoirName, reservoirId) {
+  console.log("pasando por generateLevelChart")
+
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
   let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
@@ -390,7 +394,7 @@ function generateFlowBusChart(canvas, selectedElement, type, PDTO, edges, busNam
  * @returns {Array} arreglo con el dataset
  */
 function setUpFlowData(edges, busId, currentHydrology){
-
+ console.log("pasando por setUpFlowData")
   let flowData = [];
   busId = parseInt(busId);
 
@@ -612,6 +616,7 @@ Chart.plugins.register({
  * Genera gráfico apilado de generación del sistema.
  */
 function showSystemStackedChart(){
+  console.log("pasando por modulo action-chartjs función showSystemStackedChart")
   const pdto = new PlotableDataType(
     "Generación de la barra",
     "Tiempo",

@@ -162,13 +162,12 @@ function openFilesWindow(name){
  * @param name Nombre del proyecto
  */
 function startProject(name){
-
+  console.log("Se entro en startProject");
   fileSystem.getFolder(fileSystem.projects, name, project =>
     fileSystem.getFile(project, "config.json", configFile =>
       fileSystem.readFromFile(configFile, text => {
         var cfg = JSON.parse(text);
         cfg.RESULTS_ENABLED = !(cfg.RESULTS_DISABLED)
-        console.log(cfg);
         var url = "app.html?base_uri={BASE_FOLDER_NAME}&"+
                                         "model={MODEL_FOLDER_NAME}&"+
                                         "debug={ENABLE_TIME_LOG}&"+

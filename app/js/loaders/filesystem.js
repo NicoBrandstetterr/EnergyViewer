@@ -29,6 +29,7 @@ fileSystem.createFolder = function(folder,name,afterCreation){
 * Luego llama afterCreation pasandole el FolderEntry.
 */
 fileSystem.getFolder = function(folder,name,handler){
+	console.log("pasando por getFolder");
 	folder.getDirectory(name,{exclusive:true},handler,fsErrorHandler);
 };
 
@@ -53,6 +54,7 @@ fileSystem.createFile = function(folder,name,afterCreation){
 * Luego llama afterCreation pasandole el FileEntry.
 */
 fileSystem.getFile = function(folder,name,handler){
+	console.log("pasando por getFile");
 	folder.getFile(name,{exclusive:true},handler,fsErrorHandler);
 };
 
@@ -101,6 +103,7 @@ fileSystem.writeToFile = function(writableFileEntry,entries,afterWrite) {
 * el resultado de la lectura como parametro
 */
 fileSystem.readFromFile = function(readableFileEntry,afterRead) {
+	console.log("pasando por readFromFile");
     readableFileEntry.file(function(file) {
       var reader = new FileReader();
       //Creo un reader y le digo que tras leer llame a afterRead con el contenido

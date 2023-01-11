@@ -13,7 +13,7 @@
  * @param PDTO Estructura de datos abstracta que representa
  */
 function setUpChart(canvas, xlabel, type, dataset, chartName, lblStrX, lblStrY, selectedElement, PDTO) {
-
+    console.log("apareciendo en SetUpChart")
     const ctx = canvas[0].getContext('2d');
 
     let config = {
@@ -83,7 +83,7 @@ function setUpChart(canvas, xlabel, type, dataset, chartName, lblStrX, lblStrY, 
  * @param xlabel Etiqueta del eje X en gráfico
  */
 function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
-
+    console.log("Pasando por addDataSets")
     let color = 0;
     for (const key in allData) {
         // check if the property/key is defined in the object itself, not in parent
@@ -99,6 +99,7 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
 
                 if (color === 0){
                     for (let i = 0; i < data.length; i++) {
+                        console.log("pasandole data[i][xaxis]: ",data[i])
                         xlabel.push(data[i][xAxis]);
                     }
                 }
@@ -167,7 +168,7 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
  * @param yAxis Llave de valores de eje Y
  */
 function addCentralData(data, tipo, centralsData, yAxis) {
-
+    console.log("pasando por addCentralData")
     if (!(tipo in centralsData)){
         centralsData[tipo] = [];
     }
@@ -180,7 +181,7 @@ function addCentralData(data, tipo, centralsData, yAxis) {
     } else { // Datos nuevos agregados completamente, solo interesa time y generación.
       for(let i = 0; i < data.length; i++){
         centralsData[tipo][i] = { time : i+1,  [yAxis] : data[i][yAxis]};
-        console.log(yAxis, centralsData[tipo][i]);
+        // console.log(yAxis, centralsData[tipo][i]);
       }
     }
 }
@@ -195,6 +196,7 @@ function addCentralData(data, tipo, centralsData, yAxis) {
  * @returns {Function}
  */
 function createCallback(x, m, centralsData, yAxis) {
+    console.log("Pasando por modulo stacked-charts función createCallBack")
     return function() {
         if (x.readyState === 4){
             addCentralData(JSON.parse(this.responseText), m, centralsData, yAxis);

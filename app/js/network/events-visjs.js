@@ -14,7 +14,7 @@
  * @param edges aristas de la red
  */
 function addTriggerEvents(network, topologyType, nodes, edges) {
-
+  console.log("pasando por addTriggerEvents")
   // Oculta la barra de los graficos en caso de hacer click.
   network.on("click", function (params) {
     $("#context-menu").addClass('hidden');
@@ -85,21 +85,21 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
           "time",
           "marginal_cost"
         ),
-      "Demanda E":
+      "Demanda Energía":
         new PlotableDataType(
           "Gráfico de demanda de Energía",
           "Tiempo",
-          "DemandaE",
+          "Demanda-Energía",
           "[Bloques]",
           "[MWh]",
           "time",
           "DemBarE"
         ),
-      "Demanda P":
+      "Demanda Potencia":
         new PlotableDataType(
           "Gráfico de demanda de Potencia",
           "Tiempo",
-          "DemandaP",
+          "Demanda-Potencia",
           "[Bloques]",
           "[MW]",
           "time",

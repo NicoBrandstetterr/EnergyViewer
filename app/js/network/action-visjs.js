@@ -42,7 +42,7 @@ function generateNetwork(container, nodesInput, edgesInput, topologyType) {
  * 2: hídrica
  * 3: geo
  */
-
+  console.log("se entro en generateNetwork")
   // Variables para contruir el grafo.
   let network, nodes, edges;
 

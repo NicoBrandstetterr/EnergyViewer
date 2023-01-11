@@ -6,7 +6,7 @@
  * @returns {string} Configuración de arreglo RGB codificado como string
  */
 function randomColor(seed = null) {
-
+  console.log("pasando por randomColor")
   if (seed === null) seed = Math.floor(Math.random()*3);
   var rgb = [];
   rgb[seed%3] = Math.floor(Math.random()*255);
@@ -23,7 +23,7 @@ function randomColor(seed = null) {
  * @param end Valor final del rango de x
  */
 function chartUpdateXAxis(myChart, start, end) {
-
+  console.log("Pasando por ChartUpdateXAxis")
   // Se obtienen los valores que contienen los selects.
   let start_val = parseInt(start.find(":selected").val());
   let end_val = parseInt(end.find(":selected").val());
@@ -75,7 +75,7 @@ function chartUpdateXAxis(myChart, start, end) {
  * @param selectedElement identificador del objeto del que se esta sacando información (barra, línea, etc.; es un número.)
  */
 function addGraphEvents(myChart, PDTO, selectedElement) {
-	
+	console.log("pasando addGraphEvents")
 	let csvButton = $("#" + (PDTO.print()).replace(/ /gi,"_").normalize() + "-" + selectedElement + "-csv");
   
 	  csvButton.click( () => {	  
@@ -196,7 +196,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
 
   let xlabel = [];
   let ylabel = [];
-
+  console.log("pasando por SetUpSingleData")
   // Genera título en caso de no tener
   if(chosenHydrology == null) chosenHydrology = 1; 
   if (title == null)
@@ -308,7 +308,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
  * @param category tipo de dato ('bus', 'line', etc.)
  */
 function setUpData(data,canvas, title, type, bkgCol, brdCol, txt, labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO, category) {
-
+  console.log("pasando por modulo single-chart funcion setUpData")
   let result = setUpSingleData(data, canvas, title, type, bkgCol, brdCol, txt, labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO);
   let hydrolist = $("#" + (PDTO.print()).replace(/ /gi,"_").normalize() + "-" + selectedElement);
   

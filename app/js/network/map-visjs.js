@@ -63,6 +63,7 @@ function physicsMap() {
  * Carga datos geográficos (con latitud y longitud)
  */
 function loadGeoData(network){
+  console.log("pasando por loadGeoData")
   var geoReq = new XMLHttpRequest();
   var geoReq2 = new XMLHttpRequest();
   geoReq.onreadystatechange = function () {

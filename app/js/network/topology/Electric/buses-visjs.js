@@ -280,9 +280,9 @@ function getNodesUpdates(){
     const active = inodes[i].active === 1 ? "Si" : "No";
     let tooltip = generateTooltip(["Barra: " + inodes[i].nodeName.replace(/_/gi, " "), 
                                   "Activo: " + active, 
-                                  "Costo marginal: " + parseFloat(currentBusTime.marginal_cost).toFixed(2) + " [USD/MWh]", 
-                                  "DemandaE: " + parseFloat(currentBusTime.DemBarE).toFixed(2) + " [MWh]",
-                                  "DemandaP: " + parseFloat(currentBusTime.DemBarP).toFixed(2) + " [MW]"]);
+                                  "Costo marginal: " + parseFloat(currentBusTime.marginal_cost).toFixed(1) + " [USD/MWh]", 
+                                  "Demanda-Energía: " + parseFloat(currentBusTime.DemBarE).toFixed(1) + " [MWh]",
+                                  "Demanda-Potencia: " + parseFloat(currentBusTime.DemBarP).toFixed(1) + " [MW]"]);
 
     let node = {
       id: inodes[i].id,

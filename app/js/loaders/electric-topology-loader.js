@@ -15,14 +15,17 @@ gReq.onreadystatechange = function () {
   if (this.readyState === 4) {
     generators = JSON.parse(this.responseText);
 	  createLog('Archivo de generadores leído', LOG_TYPE.SUCCESS)
+    console.log("pasando por gReq.onreadystatechange")
     loadElectricTopology(buses, lines, generators);
     parseElectricTopologyToNetwork();
     addDataToMapNetwork();
+    console.log("Se viene creacion red electrica")
     var result = generateNetwork(electricContainer, nodesArray, edgesArray, TOPOLOGY_TYPES.ELECTRIC);
 	  createLog('Red eléctrica generada correctamente!', LOG_TYPE.SUCCESS)
     electricNetwork = result.network;
     electricNodes = result.nodes;
     electricEdges = result.edges;
+    console.log("se viene creacion de vista georeferenciada")
     var resultMap = generateNetwork(geoContainer, nodesMArray, edgesMArray, TOPOLOGY_TYPES.GEO);
 	  createLog('Vista georeferenciada generada correctamente!', LOG_TYPE.SUCCESS)
     geoNetwork = resultMap.network;
@@ -35,7 +38,9 @@ gReq.onreadystatechange = function () {
 };
 
 lReq.onreadystatechange = function () {
+  
   if (this.readyState === 4) {
+    console.log("pasando por lReq.onreadystatechange")
     lines = JSON.parse(this.responseText);
     if(!CONFIG.RESULTS_DISABLED) loadLinesFiles();
     createLog('Archivo de líneas leído', LOG_TYPE.SUCCESS);
@@ -45,7 +50,9 @@ lReq.onreadystatechange = function () {
 };
 
 bReq.onreadystatechange = function () {
+  
   if (this.readyState === 4) {
+    console.log("pasando por bReq.onreadystatechange")
     buses = JSON.parse(this.responseText);
 	  createLog('Archivo de barras leído', LOG_TYPE.SUCCESS)
     lReq.open("GET", CONFIG.URL_LINES, false);

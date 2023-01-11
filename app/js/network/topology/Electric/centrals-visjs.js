@@ -388,9 +388,9 @@ function getCentralsUpdates() {
         }
     }
     
-    let capacity = parseFloat(inodes[i].capacity).toFixed(2);
-    let maxPower = parseFloat(inodes[i].max_power).toFixed(2);
-    let currentGeneration = parseFloat(currentCentralTime.CenPgen).toFixed(2);
+    let capacity = parseFloat(inodes[i].capacity).toFixed(1);
+    let maxPower = parseFloat(inodes[i].max_power).toFixed(1);
+    let currentGeneration = parseFloat(currentCentralTime.CenPgen).toFixed(1);
 
     let tooltip = generateTooltip(["Generador: " + inodes[i].nodeName,
                                     "Tipo: " + inodes[i].tipo,

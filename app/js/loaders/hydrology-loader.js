@@ -163,6 +163,7 @@ function loadBusFile(busId, noLoadAction , loadAction, hydro) {
  * @param typeId tipo de dato a cargar ('buses', 'lines', 'centrals', 'reservoirs')
  */
 function loadTypeFile(elementId, noLoadAction, loadAction, hydro, typeId){
+  // console.log("pasando por modulo hydrology-loader función LoadTypeFile")
   if(typeof hydro === 'undefined') hydro = chosenHydrology;
 
   // Verifica si esta la estructura de datos necesaria.
