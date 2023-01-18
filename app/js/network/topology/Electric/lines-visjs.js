@@ -6,7 +6,7 @@
 
 // Existe una letiable lines en donde se cargan los datos de las líneas previamente.
 function parseLines(lines, electricTopology) {
-
+  console.log("pasando por parseLines")
   // Formamos todas las aristas del grafo que estan representadas por las líneas electricas.
   // Cada arista es de la forma {from: idOrigen, to: idDestino}
 
@@ -43,7 +43,8 @@ function parseLines(lines, electricTopology) {
     let active = lines[i].active === 1 ? "Si" : "No";
 
     let currentLineTime = {
-      flow: 0
+      flow: 0,
+      capacity: 0
     };
     
     // Verificar posibles errores
@@ -65,10 +66,11 @@ function parseLines(lines, electricTopology) {
     let tooltip = generateTooltip(["Línea: " + "",
                                   "Activo: " + active,
                                   "Capacidad: " + lines[i].capacity + " [MW]", 
-                                  "Flujo máximo: " + lines[i].max_flow_a_b + " [MW]", 
-                                  "Flujo actual: " + parseFloat(currentLineTime.flow).toFixed(2) + " [MW]", 
-                                  "Resistencia: " + parseFloat(lines[i].r).toFixed(2) + " [Ω]",
-                                  "Reactancia: " + parseFloat(lines[i].x).toFixed(2) + " [Ω]",
+                                  // "Flujo máximo: " + parseFloat(currentLineTime.capacity).toFixed(1) + " [MW]", 
+                                  "Flujo máximo: " + lines[i].max_flow_a_b + " [MW]",
+                                  "Flujo actual: " + parseFloat(currentLineTime.flow).toFixed(1) + " [MW]", 
+                                  "Resistencia: " + parseFloat(lines[i].r).toFixed(1) + " [Ω]",
+                                  "Reactancia: " + parseFloat(lines[i].x).toFixed(1) + " [Ω]",
                                   "Voltaje: " + lines[i].voltage + " [kV]"]);
 
     let bus_from_id = lines[i].bus_a;
@@ -100,7 +102,7 @@ function parseLines(lines, electricTopology) {
       max_flow_positive: lines[i].max_flow_a_b,
       max_flow_negative: lines[i].max_flow_b_a,
       flow: currentLineTime.flow,
-      color: voltageColor[lines[i].voltage], // FIXME Colores de las aristas dependientes del voltaje."Reactancia: " + parseFloat(currentLineTime.x).toFixed(2) + " [Ω]",
+      color: voltageColor[lines[i].voltage], // FIXME Colores de las aristas dependientes del voltaje."Reactancia: " + parseFloat(currentLineTime.x).toFixed(1) + " [Ω]",
       label : ("{0}").formatUnicorn(circuits),
       font : { //La font para el label
         align : 'middle',
@@ -141,7 +143,7 @@ function addLinesToMapNetwork(lines){
 }
 
 function getUpdates(){
-
+  console.log("pasando por modulo lines-visjs función getupdates")
   let iedges;
   if (currentTopologyType === TOPOLOGY_TYPES.ELECTRIC)
     iedges = electricTopology.lines;
@@ -213,13 +215,14 @@ function getUpdates(){
     // Variable para dejar en el label si esta activo en forma intuitiva.
     let active = iedges[i].active === 1 ? "Si" : "No";
     
+    // tooltip es la barra de información que aparece al posar el mouse sobre una linea.
     let tooltip = generateTooltip(["Línea: " + lineName,
                                     "Activo: " + active,
                                     "Capacidad: " + iedges[i].capacity + " [MW]", 
                                     "Flujo máximo: " + iedges[i].max_flow_positive + " [MW]", 
-                                    "Flujo actual: " + parseFloat(currentLineTime.flow).toFixed(2) + " [MW]", 
-                                    "Resistencia: " + parseFloat(iedges[i].resistance).toFixed(2) + " [Ω]",
-                                    "Reactancia: " + parseFloat(iedges[i].reactance).toFixed(2) + " [Ω]",
+                                    "Flujo actual: " + parseFloat(currentLineTime.flow).toFixed(1) + " [MW]", 
+                                    "Resistencia: " + parseFloat(iedges[i].resistance).toFixed(1) + " [Ω]",
+                                    "Reactancia: " + parseFloat(iedges[i].reactance).toFixed(1) + " [Ω]",
                                     "Voltaje: " + iedges[i].voltage + " [kV]"]);
 
     iedges[i].flow = currentLineTime.flow;

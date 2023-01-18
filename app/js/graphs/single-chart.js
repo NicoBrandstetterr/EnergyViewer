@@ -192,105 +192,236 @@ function addGraphEvents(myChart, PDTO, selectedElement) {
  * responsive: boolean}}}}
  */
 function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
-                         labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO) {
-
-  let xlabel = [];
-  let ylabel = [];
+                         labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO,elementO=null) {
   console.log("pasando por SetUpSingleData")
-  // Genera título en caso de no tener
-  if(chosenHydrology == null) chosenHydrology = 1; 
-  if (title == null)
-    title = "H" + chosenHydrology;
+  
+  if(elementO===null ) {
 
-  // Guardamos los datos en nuevos arreglos.
-  for (let i = 0; i < data.length; i++) {
-
-    let xAxisData = data[i][xAxis];
-    let yAxisData = data[i][yAxis];
-
-    xlabel.push(xAxisData);
-    ylabel.push(yAxisData);
-  }
-
-  // Canvas donde se dibujará el gráfico.
-  const ctx = canvas[0].getContext('2d');
-
-  // Configuraciones del gráfico.
-  let config = {
-    type: type, // Charts de tipo 'line' solo usan un color
-    data: {
+    let xlabel = [];
+    let ylabel = [];
+    
+    // Genera título en caso de no tener
+    if(chosenHydrology == null) chosenHydrology = 1; 
+    if (title == null)
+      title = "H" + chosenHydrology;
+    
+    
+    // Guardamos los datos en nuevos arreglos.
+    for (let i = 0; i < data.length; i++) {
+  
+      let xAxisData = data[i][xAxis];
+      let yAxisData = data[i][yAxis];
+      
+      xlabel.push(xAxisData);
+      ylabel.push(yAxisData);
+    }
+  
+    // Canvas donde se dibujará el gráfico.
+    const ctx = canvas[0].getContext('2d');
+  
+    // Configuraciones del gráfico.
+    let config = {
+      type: type, // Charts de tipo 'line' solo usan un color
+      data: {
+        labels: xlabel,
+        datasets: [{
+          label: title,
+          data: ylabel,
+          borderWidth: 0,
+          lineTension: 0,
+          fill: false,
+          backgroundColor: bkgCol,//fillcolor,
+          borderColor: brdCol//linecolor,
+        }
+        ]
+      },
+      options: {
+        title: {
+          display: true,
+          text: txt
+        },
+  
+        tooltips: {
+          mode: 'index',
+          intersect: false
+        },
+        hover: {
+          mode: 'index',
+          intersect: false
+        },
+        elements: {
+          point: {
+            radius: 0
+          }
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            },
+            scaleLabel: {
+              display: true,
+              labelString: labelStrY
+            }
+          }],
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: labelStrX
+            },
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
+        responsive: true
+      }
+    };
+  
+    // Se genera el gráfico ChartJS.
+    let myChart = new Chart(ctx, config);
+    
+    // Se corrige la responsiveness de los gráficos
+    $(window).resize(function() {
+      myChart.resize();
+    });
+    console.log("configsss: ",config.data.datasets, typeof config.data.datasets, config.data.datasets.length)
+    
+    // Se agregan eventos con respecto al grafico creado.
+    addGraphEvents(myChart, PDTO, selectedElement);
+  
+    return {chart: myChart, config: config}
+    }                        
+  else if (elementO.category === "bus-to-bus"){
+    console.log("Entrando al edit lineas")
+    let xlabel = [];
+    let flujo = [];
+    let maximoflujo=[];
+    let maxcolor=randomColor();
+    let minimoflujo=[];
+    let mincolor=randomColor();
+    
+    // Genera título en caso de no tener
+    if(chosenHydrology == null) chosenHydrology = 1; 
+    if (title == null)
+      title = "H" + chosenHydrology;
+    
+    
+    // Guardamos los datos en nuevos arreglos.
+    for (let i = 0; i < data.length; i++) {
+  
+      let xAxisData = data[i][xAxis];
+      xlabel.push(xAxisData);
+      flujo.push( data[i][yAxis]);
+      maximoflujo.push(data[i].capacity)
+      minimoflujo.push(-data[i].capacity)
+    }
+  
+    // Canvas donde se dibujará el gráfico.
+    const ctx = canvas[0].getContext('2d');
+    let chartData={
       labels: xlabel,
       datasets: [{
         label: title,
-        data: ylabel,
+        data: flujo,
         borderWidth: 0,
         lineTension: 0,
         fill: false,
         backgroundColor: bkgCol,//fillcolor,
         borderColor: brdCol//linecolor,
+      },
+      {
+        label: "Capacidad Máxima",
+        data: maximoflujo,
+        borderWidth: 0,
+        lineTension: 0,
+        fill: false,
+        backgroundColor: maxcolor,//fillcolor,
+        borderColor: maxcolor//linecolor,
+      },
+      {
+        label: "Capacidad Minima",
+        data: minimoflujo,
+        borderWidth: 0,
+        lineTension: 0,
+        fill: false,
+        backgroundColor: mincolor,//fillcolor,
+        borderColor: mincolor//linecolor,
       }
+
       ]
-    },
-    options: {
-      title: {
-        display: true,
-        text: txt
-      },
-
-      tooltips: {
-        mode: 'index',
-        intersect: false
-      },
-      hover: {
-        mode: 'index',
-        intersect: false
-      },
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          },
-          scaleLabel: {
-            display: true,
-            labelString: labelStrY
-          }
-        }],
-        xAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: labelStrX
-          },
-          ticks: {
-            beginAtZero: true
-          }
-        }]
-      },
-      responsive: true
     }
-  };
-
-  // Se genera el gráfico ChartJS.
-  let myChart = new Chart(ctx, config);
+    // Configuraciones del gráfico.
+    let config = {
+      type: type, // Charts de tipo 'line' solo usan un color
+      data: chartData,
+      options: {
+        title: {
+          display: true,
+          text: txt
+        },
   
-  // Se corrige la responsiveness de los gráficos
-  $(window).resize(function() {
-    myChart.resize();
-  });
+        tooltips: {
+          mode: 'index',
+          intersect: false
+        },
+        hover: {
+          mode: 'index',
+          intersect: false
+        },
+        elements: {
+          point: {
+            radius: 0
+          }
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            },
+            scaleLabel: {
+              display: true,
+              labelString: labelStrY
+            }
+          }],
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: labelStrX
+            },
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
+        responsive: true
+      }
+    };
+  
+    // Se genera el gráfico ChartJS.
+    let myChart = new Chart(ctx, config);
+    
+    // Se corrige la responsiveness de los gráficos
+    $(window).resize(function() {
+      myChart.resize();
+    });
+    console.log("configsss: ",config.data.datasets)
+    // Se agregan eventos con respecto al grafico creado.
+    addGraphEvents(myChart, PDTO, selectedElement);
+  
+    return {chart: myChart, config: config}
 
-  // Se agregan eventos con respecto al grafico creado.
-  addGraphEvents(myChart, PDTO, selectedElement);
+  }
+  else{
+    console.log("No existe elementO.category para este caso")
+  }
 
-  return {chart: myChart, config: config}
+  
 }
 
 /**
  *
- * Se generan las configuaraciones necesarias para poder graficar distintas hidrologías.
+ * Se generan las configuraciones necesarias para poder graficar distintas hidrologías.
  *
  * @param data Datos que serán graficados.
  * @param canvas Donde se dibujara el gráfico. HTML object.
@@ -307,9 +438,9 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
  * @param PDTO Datos asociados con el gráfico
  * @param category tipo de dato ('bus', 'line', etc.)
  */
-function setUpData(data,canvas, title, type, bkgCol, brdCol, txt, labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO, category) {
+function setUpData(data,canvas, title, type, bkgCol, brdCol, txt, labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO, category,elementO=null) {
   console.log("pasando por modulo single-chart funcion setUpData")
-  let result = setUpSingleData(data, canvas, title, type, bkgCol, brdCol, txt, labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO);
+  let result = setUpSingleData(data, canvas, title, type, bkgCol, brdCol, txt, labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO,elementO);
   let hydrolist = $("#" + (PDTO.print()).replace(/ /gi,"_").normalize() + "-" + selectedElement);
   
 
@@ -327,17 +458,18 @@ function setUpData(data,canvas, title, type, bkgCol, brdCol, txt, labelStrX, lab
   }
 
   // Evaluar en qué casos nos interesa mostrar o no mostrar una cota
-  if (yAxis === 'marginal_cost'){
+  // if (yAxis === 'marginal_cost'){
 
-  } else if (yAxis === 'flow' && category === 'line') {
-    const edge = currentEdges.get(selectedElement);
-    // Creamos el set de datos
-    let dataSetMax = getDashedDataSet('Máximo flujo', randomColor());
-    let dataSetMin = getDashedDataSet('Mínimo flujo', randomColor());
-    // Y dejamos como flujo máximo el tope de los datos.
-    updateChart(getConstantData(data, edge.max_flow_positive, 'max_flow_positive'), dataSetMax, 'max_flow_positive');
-    updateChart(getConstantData(data, edge.max_flow_negative, 'max_flow_negative'), dataSetMin, 'max_flow_negative');
-  }
+  // } else if (yAxis === 'flow' && category === 'line') {
+  //   const edge = currentEdges.get(selectedElement);
+  //   // Creamos el set de datos
+  //   let dataSetMax = getDashedDataSet('Máximo flujo', randomColor());
+  //   let dataSetMin = getDashedDataSet('Mínimo flujo', randomColor());
+  //   // Y dejamos como flujo máximo el tope de los datos.
+  //   console.log("Ahora, veamos type de edge.max_flow_positive: ", edge.max_flow_positive)
+  //   updateChart(getConstantData(data, edge.max_flow_positive, 'max_flow_positive'), dataSetMax, 'max_flow_positive');
+  //   updateChart(getConstantData(data, edge.max_flow_negative, 'max_flow_negative'), dataSetMin, 'max_flow_negative');
+  // }
 
   /**
    * Entrega un set de datos de largo igual al arreglo data entregado, y rellena en el lugar name con valores constant.
@@ -361,9 +493,13 @@ function setUpData(data,canvas, title, type, bkgCol, brdCol, txt, labelStrX, lab
    * @param yAxis eje y que se toman los datos
    */
   function updateChart(data, newDataset, yAxis){
+    console.log("pasando por updateChart");
     for (let i = 0; i < data.length; ++i) {
       newDataset.data.push(data[i][yAxis]);
     }
+    console.log("result.blabla. datasets: ",result.config.data.datasets);
+    console.log("newdataset: ",newDataset);
+    console.log("viendo dataset config: ",result.config.data.datasets)
     result.config.data.datasets.push(newDataset);
     result.chart.update();
 
@@ -380,7 +516,7 @@ function setUpData(data,canvas, title, type, bkgCol, brdCol, txt, labelStrX, lab
      */
 
   function chartType(params, selectedElement, newDataset, result, yAxis, typeId) {
-
+    console.log("pasando por chartType")
     /* Se cargan los datos de la barra seleccionada. */
     let callBack = function (x, hydrology) {
       return function() {
@@ -424,8 +560,16 @@ function setUpData(data,canvas, title, type, bkgCol, brdCol, txt, labelStrX, lab
 
 
       // Con esto se elimina el dataset del indice = index.
-      result.config.data.datasets.splice(index, 1);
-      result.chart.update();
+      if (category === 'line'){
+        console.log("index datasetes")
+        result.config.data.datasets.splice(index, 1);
+        result.chart.update();
+      }
+      else {
+        result.config.data.datasets.splice(index, 1);
+        result.chart.update();
+      }
+      
       // Objeto HTML que contiene el tiempo inicial.
       let start = $("#" + (PDTO.print()).replace(/ /gi,"_").normalize() + "-" +
         selectedElement+ "-start");
@@ -448,11 +592,11 @@ function setUpData(data,canvas, title, type, bkgCol, brdCol, txt, labelStrX, lab
         fill: false
       };
 
-
       // Ahora veo que tipo de gráfico se agrega, aquí tener cuidado con el segundo parámetro, depende del id del archivo.
       if (category === 'bus'){
         chartType(params, selectedElement, newDataset, result, yAxis, 'buses');
       } else if (category === 'line'){
+        console.log("Entrando a Linea setUpData")
         let edge = currentEdges.get(selectedElement); // Para obtener id de la arista.
         chartType(params, edge.lineNumber, newDataset, result, yAxis, 'lines');
       } else if (category === 'reservoir'){

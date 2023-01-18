@@ -13,13 +13,17 @@
  * @param nodeName Nombre del nodo (elemento de grafo) desde el cual se obtendran los dato a graficar. En este caso es una barra.
  */
 function generateBusChart(canvas, selectedElement, type, PDTO, nodeName) {  // PDTO === Plotable DataType Object Esta función recibe datos y genera un grafico con ellos en el canvas
+  console.log("pasando por generateBusChart")
+  console.log("presentando canvas: ", canvas)
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
 	let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
+  console.log("containerID: ",containerID)
 	canvas.attr("id","canvas_" + containerID);
   let row = canvas.parent().parent();
+  console.log("row: ",row)
   canvas.attr("id", "row_" + containerID);
-
+  console.log("presentando canvas: ", canvas)
   let title = "H1"; // Título en negritas del gráfico.
   let newColor = randomColor();
   let bkgCol= newColor; // Color de la línea,
@@ -48,7 +52,8 @@ function generateBusChart(canvas, selectedElement, type, PDTO, nodeName) {  // P
  * @param hydroNum Numero de la hidrologia desde donde se agregaran datos
 
  */
-function generateLineChart(canvas, elementObj, type, PDTO, fromName, toName, hydroNum) {
+function generateFlowLineChart(canvas, elementObj, type, PDTO, fromName, toName, hydroNum) {
+  console.log("pasando por generateLineChart")
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
   var containerID = 'chart' + elementObj.lineNumber + '-' + xAxis + '-' + yAxis;
@@ -58,18 +63,19 @@ function generateLineChart(canvas, elementObj, type, PDTO, fromName, toName, hyd
   row.id = "row_" + containerID;
 
   if( chosenHydrology == null) chosenHydrology = 1;
-  var title = "H" + chosenHydrology;
+  var title = "Flujo Linea H" + chosenHydrology;
   var bkgCol = 'rgb(255, 99, 132)';
   var bdrCol = 'rgb(255, 99, 132)';
-  var lblStrX = 'Tiempo [horas]';
+  var lblStrX = 'Tiempo [bloques]';
   var lblStrY= 'Flujo [MW]';
   var txt='Flujo en la línea ' + fromName + "->" + toName;
 
-  let result = loadFunctions(canvas, title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, elementObj.id, PDTO, 'line', 'lines');
+  let result = loadFunctions(canvas, title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, elementObj.id, PDTO, 'line', 'lines',elementObj);
 
   /* se cargan los datos y si existen se crea el gráfico. */
   loadTypeFile(elementObj.lineNumber, result.pl , result.cb, chosenHydrology, 'lines');
 }
+
 
 /**
  * Aquí se crean las dos funciones que se ejecutaran en caso de leer de un archivo o que los datos esten previamente cargados.
@@ -89,7 +95,8 @@ function generateLineChart(canvas, elementObj, type, PDTO, fromName, toName, hyd
  * @param kind El tipo de elemento a graficar (por ejemplo, buses o lineas)
  * @returns {{cb: callBack, pl: preLoad}}
  */
-function loadFunctions(canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category, kind){
+function loadFunctions(canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category, kind,elementO=null){
+  console.log("pasando por loadFunctions")
 
   /* Se cargan los datos de la barra seleccionada. */
   let callBack = function (x) {
@@ -101,14 +108,14 @@ function loadFunctions(canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY
           hydrologyTimes[chosenHydrology][kind][selectedElement] = busData;
         }
 
-        setUpData(busData, canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category);
+        setUpData(busData, canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category,elementO);
       }
     };
   };
 
   /* Si los datos estan cargados se ejecuta este método. */
   let preLoad = function (data) {
-    setUpData(data, canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category);
+    setUpData(data, canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY, xAxis, yAxis, selectedElement, PDTO, category,elementO);
   };
 
   return {cb: callBack, pl: preLoad}
@@ -125,7 +132,7 @@ function loadFunctions(canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY
  * @param hydro Número de la hidrología
  */
 function generateGenerationChart(canvas, selectedElement, type, PDTO, centralName, centralType, hydro) {
-	
+	console.log("pasando por generateGenerationChart")
 	console.log(selectedElement);
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
@@ -275,6 +282,7 @@ function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
 
   /* Se cargan los datos de la barra seleccionada. */
   let callBack = function(m, id) {
+    // console.log("pasando por callBack de generateSystemPiledGraph")
     return function (x) {
       return function() {
         if (x.readyState === 4){
@@ -293,6 +301,7 @@ function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
 
   /* Si los datos estan cargados se ejecuta este método. */
   let preLoad = function (m) {
+    // console.log("pasando por preload de generateSystemPiledGraph")
     return function (data) {
       addCentralData(data, m, centralsData, yAxis);
     }
@@ -305,7 +314,7 @@ function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
   }
 
   //addDataSets(centralsData);
-  console.log("Se presenta, previo a addDataSets, los valores yAxis: ", typeof yAxis)
+  console.log("Se presenta, previo a addDataSets, los valores yAxis: ", yAxis)
   addDataSets(centralsData, xAxis, yAxis, setDeDatos, xlabel);
   setUpChart(canvas, xlabel, type, setDeDatos, 'Generación del sistema', lblStrX, lblStrY, 'Sistema', PDTO);
 }
@@ -364,7 +373,7 @@ function generateLevelChart(canvas, selectedElement, type, PDTO, reservoirName, 
  * @param busId Identificador de la barra a graficar
  */
 function generateFlowBusChart(canvas, selectedElement, type, PDTO, edges, busName, busId) {
-
+  console.log("pasando por generateFlowBusChart")
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
 
@@ -385,6 +394,343 @@ function generateFlowBusChart(canvas, selectedElement, type, PDTO, edges, busNam
     xAxis, yAxis, busId, PDTO, 'bus-flow');
 
 }
+
+
+/**
+ * 
+ * @param canvas Elemento HTML donde se dibujara el gráfico. HTML object.
+ * @param selectedElement Elemento seleccionado (objeto) desde el gráfico. Se refiere al ID.
+ * @param type tipo string que identifica estilo de gráfico (line, pie, etc.)
+ * @param PDTO Datos asociados con el gráfico
+ * @param {*} elementObject Objeto que contiene información de la barra
+ */
+
+function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
+  console.log("pasando por function percentilll")
+  if (elementObject.category === "bus-to-bus"){
+    console.log("Percentil Lineas");
+    console.log("Mostrando objeto",elementObject);
+    console.log("Mostrando ID y numberID: ",elementObject.lineNumber,selectedElement);
+    let jsonUrl=CONFIG.PERCENTIL_FLOW_LINE_FOLDER+'line_'+elementObject.lineNumber.toString()+'.json';
+    console.log("jsonURL: ",jsonUrl)
+    let request = new XMLHttpRequest();
+    let xAxis = PDTO.idX;
+    let yAxis = PDTO.idY;
+    request.open('GET', jsonUrl, false);
+    request.onreadystatechange = function() {
+        if (this.readyState === 4) {
+          console.log("Se entro al readystate===4")
+          let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
+          canvas.attr("id","canvas_" + containerID);
+          
+          let title = "Percentil_FL"; // Título en negritas del gráfico.
+          let newColor = randomColor();
+          let bkgCol= newColor; // Color de la línea,
+          let bdrCol= newColor; // Color del borde de la línea,
+          let labelStrX= PDTO.labelX + " " + PDTO.unitX; // Etiqueta del eje x
+          let labelStrY= PDTO.labelY + " " + PDTO.unitY; // Etiqueta del eje y
+          
+          
+          let perc_data = JSON.parse(this.responseText);
+          console.log("perc_Data: ",perc_data)
+          console.log("perc_Data type: ",typeof perc_data)
+          let txt = PDTO.title + " en " + perc_data[0].LinName; // Título del dataset correspondiente.
+  
+          // Inicia simil con setUpSingleDATA
+          let perc0 = [], perc20 = [], perc80 = [], perc100 = [], Min = [], Max =[]
+            let time = []
+          perc_data.forEach(element => {
+            perc0.push(parseFloat(element.perc0.toFixed(1)) ) // toFixed para 1 decimal y parseFloat para volver a pasar de str a float.
+            perc20.push(parseFloat(element.perc20.toFixed(1)))
+            perc80.push(parseFloat(element.perc80.toFixed(1)))
+            perc100.push(parseFloat(element.perc100.toFixed(1)))
+            Min.push(parseFloat(element.Min.toFixed(1)))
+            Max.push(parseFloat(element.Max.toFixed(1)))
+            time.push(element.time)
+          });
+
+          // Canvas donde se dibujará el gráfico.
+          const ctx = canvas[0].getContext('2d');
+          
+          let chartData = {
+            labels: time,
+            datasets: [
+                {
+                    label: "Perc0",
+                    data: perc0,
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                    pointBackgroundColor: 'rgba(0, 0, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Perc20",
+                    data: perc20,
+                    borderColor: 'rgba(255, 0, 0, 1)',
+                    backgroundColor: 'rgba(255, 0, 0, 0)',
+                    pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Perc80",
+                    data: perc80,
+                    borderColor: 'rgba(0, 255, 0, 1)',
+                    backgroundColor: 'rgba(0, 255, 0, 0)',
+                    pointBackgroundColor: 'rgba(0, 255, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Perc100",
+                    data: perc100,
+                    borderColor: 'rgba(0, 0, 255, 1)',
+                    backgroundColor: 'rgba(0, 0, 255, 0)',
+                    pointBackgroundColor: 'rgba(0, 0, 255, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Min",
+                    data: Min,
+                    borderColor: 'rgba(255, 255, 0, 1)',
+                    backgroundColor: 'rgba(255, 255, 0, 0)',
+                    pointBackgroundColor: 'rgba(255, 255, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                  label: "Max",
+                  data: Max,
+                  borderColor: newColor,
+                  backgroundColor: 'rgba(255, 255, 0, 0)',
+                  pointBackgroundColor: newColor,
+                  borderWidth: 2,
+                  pointRadius: 0
+              }
+            ]
+          };
+          
+          let config = {
+            type: 'line',
+            data: chartData,
+            options: {
+              title: {
+                display: true,
+                text: txt
+              },
+              tooltips: {
+                mode: 'index',
+                intersect: false
+              },
+              hover: {
+                mode: 'index',
+                intersect: false
+              },
+              elements: {
+                point: {
+                  radius: 0
+                }
+              },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true
+                  },
+                  scaleLabel: {
+                    display: true,
+                    labelString: labelStrY
+                  }
+                }],
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: labelStrX
+                  },
+                  ticks: {
+                    beginAtZero: true
+                  }
+                }]
+              },
+              responsive: true
+
+            }
+        };
+
+        let myChart = new Chart(ctx, config);
+        console.log("viendo mychart: ",myChart);
+        // Se corrige la responsiveness de los gráficos
+        $(window).resize(function() {
+          myChart.resize();
+        });
+
+        // Se agregan eventos con respecto al grafico creado.
+        addGraphEvents(myChart, PDTO, selectedElement);
+
+          }
+      }
+      request.send();
+    }
+  else if (elementObject.category === "bus"){
+    console.log("Percentil bus")
+    console.log("Mostrando objeto",elementObject);
+    console.log("Mostrando ID y numberID: ",elementObject.lineNumber,selectedElement);
+    let jsonUrl=CONFIG.PERCENTIL_MARGINAL_COST_FOLDER+'bus_'+selectedElement.toString()+'.json';
+    console.log("jsonURL: ",jsonUrl)
+    let request = new XMLHttpRequest();
+    let xAxis = PDTO.idX;
+    let yAxis = PDTO.idY;
+    request.open('GET', jsonUrl, false);
+    request.onreadystatechange = function() {
+        if (this.readyState === 4) {
+          console.log("Se entro al readystate===4")
+          let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
+          canvas.attr("id","canvas_" + containerID);
+
+          console.log("presentando canvas mod: ", canvas)
+          
+          let title = "Percentil_MC"; // Título en negritas del gráfico.
+          let newColor = randomColor();
+          let bkgCol= newColor; // Color de la línea,
+          let bdrCol= newColor; // Color del borde de la línea,
+          let labelStrX= PDTO.labelX + " " + PDTO.unitX; // Etiqueta del eje x
+          let labelStrY= PDTO.labelY + " " + PDTO.unitY; // Etiqueta del eje y
+          let txt = PDTO.title + " en la barra " + elementObject.nodeName; // Título del dataset correspondiente.
+          console.log("antes del parse")
+          let perc_data = JSON.parse(this.responseText);
+          console.log("perc_Data: ",perc_data)
+          console.log("perc_Data type: ",typeof perc_data)
+  
+          // Inicia simil con setUpSingleDATA
+          let perc0 = [], perc20 = [], perc80 = [], perc100 = [], promedio = []
+            let time = []
+          perc_data.forEach(element => {
+            perc0.push(parseFloat(element.perc0.toFixed(1)) ) // toFixed para 1 decimal y parseFloat para volver a pasar de str a float.
+            perc20.push(parseFloat(element.perc20.toFixed(1)))
+            perc80.push(parseFloat(element.perc80.toFixed(1)))
+            perc100.push(parseFloat(element.perc100.toFixed(1)))
+            promedio.push(parseFloat(element.promedio.toFixed(1)))
+            time.push(element.time)
+          });
+
+          // Canvas donde se dibujará el gráfico.
+          const ctx = canvas[0].getContext('2d');
+          
+          let chartData = {
+            labels: time,
+            datasets: [
+                {
+                    label: "Perc0",
+                    data: perc0,
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                    pointBackgroundColor: 'rgba(0, 0, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Perc20",
+                    data: perc20,
+                    borderColor: 'rgba(255, 0, 0, 1)',
+                    backgroundColor: 'rgba(255, 0, 0, 0)',
+                    pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Perc80",
+                    data: perc80,
+                    borderColor: 'rgba(0, 255, 0, 1)',
+                    backgroundColor: 'rgba(0, 255, 0, 0)',
+                    pointBackgroundColor: 'rgba(0, 255, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Perc100",
+                    data: perc100,
+                    borderColor: 'rgba(0, 0, 255, 1)',
+                    backgroundColor: 'rgba(0, 0, 255, 0)',
+                    pointBackgroundColor: 'rgba(0, 0, 255, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Promedio",
+                    data: promedio,
+                    borderColor: 'rgba(255, 255, 0, 1)',
+                    backgroundColor: 'rgba(255, 255, 0, 0)',
+                    pointBackgroundColor: 'rgba(255, 255, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 0
+                }
+            ]
+          };
+          
+          let config = {
+            type: 'line',
+            data: chartData,
+            options: {
+              title: {
+                display: true,
+                text: txt
+              },
+              tooltips: {
+                mode: 'index',
+                intersect: false
+              },
+              hover: {
+                mode: 'index',
+                intersect: false
+              },
+              elements: {
+                point: {
+                  radius: 0
+                }
+              },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true
+                  },
+                  scaleLabel: {
+                    display: true,
+                    labelString: labelStrY
+                  }
+                }],
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: labelStrX
+                  },
+                  ticks: {
+                    beginAtZero: true
+                  }
+                }]
+              },
+              responsive: true
+
+            }
+        };
+
+        let myChart = new Chart(ctx, config);
+        console.log("viendo mychart: ",myChart);
+        // Se corrige la responsiveness de los gráficos
+        $(window).resize(function() {
+          myChart.resize();
+        });
+
+        // Se agregan eventos con respecto al grafico creado.
+        addGraphEvents(myChart, PDTO, selectedElement);
+
+          }
+      }
+      request.send();
+    }
+  }
+
+
 
 /**
  * Setea los datos necesarios para que se grafiquen los flujos hacia una barra dada una hidrología.
@@ -429,7 +775,7 @@ function setUpFlowData(edges, busId, currentHydrology){
     let currentFlowData = hydrologyTimes[currentHydrology].lines[lines[i].lineNumber];
 
     if (flowData.length <= 0) {
-      console.log(currentFlowData);
+      // console.log(currentFlowData);
       for (let j = 0; j < currentFlowData.length; j++){
         flowData[j] = {time: j + 1, flow: currentFlowData[j].flow};
       }
@@ -439,7 +785,7 @@ function setUpFlowData(edges, busId, currentHydrology){
       }
     }
 
-    console.log(flowData[0].flow);
+    // console.log(flowData[0].flow);
   }
 
   return flowData;

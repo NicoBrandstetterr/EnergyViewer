@@ -62,6 +62,7 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
 
   //click derecho muestra un menú para realizar graficos
   network.on("oncontext", function (params) {
+    console.log("pasando por network.on(oncontext")
     if(CONFIG.RESULTS_DISABLED) return;
     var coordX = params.event.pageX - window.outerWidth/6 - 30;
     var coordY = params.event.pageY - 30;
@@ -73,7 +74,7 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
       left: coordX + "px"
     });
 
-    // datos graficables de una barra
+    // datos graficables de una barra, Los titulos se observan al hacer click derecho sobre una barra
     var bus_datatype_dict = {
       "Costo Marginal":
         new PlotableDataType(
@@ -84,6 +85,17 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
           "[USD/MWh]",
           "time",
           "marginal_cost"
+        ),
+        "Percentiles Costos Marginales":
+        new PlotableDataType(
+          "Percentiles de Costos Marginales",
+          "Tiempo",
+          "Costo Marginal",
+          "[Bloques]",
+          "[USD/MWh]",
+          "time",
+          "percentils"
+
         ),
       "Demanda Energía":
         new PlotableDataType(
@@ -127,7 +139,7 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
         )
     };
 
-    // datos graficables de una línea
+    // datos graficables de una línea, Los titulos se observan al hacer click derecho sobre una linea
     var line_datatype_dict = {
 
       "Flujo":
@@ -139,10 +151,20 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
           "[MW]",
           "time",
           "flow"
-        )
+        ),
+      "Percentiles Flujo de Lineas":
+      new PlotableDataType(
+        "Percentiles de Flujos de Linea",
+        "Tiempo",
+        "Flujo",
+        "[Bloques]",
+        "[MW]",
+        "time",
+        "percentils"
+      )
     };
 
-    // Datos graficables en un embalse.
+    // Datos graficables en un embalse, Los titulos se observan al hacer click derecho sobre un embalse
     let reservoir_datatype_dict = {
       "Nivel de agua":
         new PlotableDataType(
@@ -156,7 +178,7 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
         )
     };
 
-    // Datos graficables en una central.
+    // Datos graficables en una central, Los titulos se observan al hacer click derecho sobre una central
     let central_datatype_dict = {
       "Generación" :
         new PlotableDataType(
@@ -640,6 +662,8 @@ function togglePhysics(enable){
  * @returns {Function} Función que configura elementos del gráfico
  */
 function wrapper_drawGraph(elementID, elementObject, PDTO) { // PDTO === Plotable DataType Object
+  console.log("pasando por wrapper_drawGraph")
+  console.log("elementObject.category: ",elementObject.category)
   return function() {
     if (elementObject.category === "bus") { // Caso en que se quiera graficar algo de la barra
       let mycanvas = createCanvas(elementID, PDTO);
@@ -656,7 +680,20 @@ function wrapper_drawGraph(elementID, elementObject, PDTO) { // PDTO === Plotabl
           elementObject.nodeName,
           elementObject.id
         );
-      } else {
+      }
+
+      else if (PDTO.idY === "percentils"){
+        percentilGraph(
+          mycanvas,
+          elementID,
+          'line',
+          PDTO,
+          elementObject
+        ); 
+
+      }
+      
+      else {
         generateBusChart(mycanvas, elementID, 'line', PDTO, elementObject.nodeName); // Dibujamos un gráfico con esta información // FIXME
       }
 
@@ -674,15 +711,34 @@ function wrapper_drawGraph(elementID, elementObject, PDTO) { // PDTO === Plotabl
         );
       }
     } else if (elementObject.category === "bus-to-bus"){ // En el caso de una línea
-
+      console.log("Pasando por la parte de flujo lineas, con pdto: ",PDTO.idY)
       let mycanvas = createCanvas(elementObject.id, PDTO);
       let bus_b = elementObject.to;
       let bus_a = elementObject.from;
+      if (PDTO.idY ==="flow"){
+        generateFlowLineChart(
+          mycanvas,
+          elementObject,
+          'line',
+          PDTO,
+          currentNodes.get(bus_a).nodeName,
+          currentNodes.get(bus_b).nodeName,
+          chosenHydrology
+        );
+      }
+      else if (PDTO.idY === "percentils"){
+        percentilGraph(
+          mycanvas,
+          elementID,
+          'line',
+          PDTO,
+          elementObject
+        ); 
+      }
+      else {
 
-      generateLineChart(mycanvas, elementObject,
-        'line', PDTO,
-        currentNodes.get(bus_a).nodeName,
-        currentNodes.get(bus_b).nodeName, chosenHydrology);
+      console.log("No está definido un grafico")
+      }
     } else if (elementObject.category === 'central') { // En el caso de una central
 
       if (PDTO.idY === 'CenPgen'){ // Si el gráfico es de generación.

@@ -87,6 +87,7 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
     let color = 0;
     for (const key in allData) {
         // check if the property/key is defined in the object itself, not in parent
+        // console.log("en AddDataSets, usando la llave: ",key)
         if (allData.hasOwnProperty(key)) {
             const data = allData[key];
             if (data.length > 0) {
@@ -94,13 +95,15 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
                 let title = key;
 
                 for (let i = 0; i < data.length; i++) {
-                    ylabel.push(data[i][yAxis]);
+                    ylabel.push(parseFloat(data[i][yAxis].toFixed(1)));
+   
                 }
 
                 if (color === 0){
                     for (let i = 0; i < data.length; i++) {
-                        console.log("pasandole data[i][xaxis]: ",data[i])
+                        // console.log("pasandole data[i][xaxis]: ", data[i])
                         xlabel.push(data[i][xAxis]);
+       
                     }
                 }
 
@@ -168,18 +171,21 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
  * @param yAxis Llave de valores de eje Y
  */
 function addCentralData(data, tipo, centralsData, yAxis) {
-    console.log("pasando por addCentralData")
+    // console.log("pasando por addCentralData, ejemplo data[1][yAxis]: ",parseFloat(data[1][yAxis]).toFixed(1))
+    console.log("Pasando por addCentralData")
     if (!(tipo in centralsData)){
         centralsData[tipo] = [];
     }
-
+    
     // Caso en el que ya hay datos
     if (centralsData[tipo].length > 0) {
         for(let i = 0; i < data.length; i++){
+            // centralsData[tipo][i][yAxis] += parseFloat(data[i][yAxis]).toFixed(1);
             centralsData[tipo][i][yAxis] += data[i][yAxis];
         }
     } else { // Datos nuevos agregados completamente, solo interesa time y generación.
       for(let i = 0; i < data.length; i++){
+        // centralsData[tipo][i] = { time : i+1,  [yAxis] : parseFloat(data[i][yAxis]).toFixed(1)};
         centralsData[tipo][i] = { time : i+1,  [yAxis] : data[i][yAxis]};
         // console.log(yAxis, centralsData[tipo][i]);
       }

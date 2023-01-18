@@ -276,7 +276,7 @@ function getNodesUpdates(){
             hydrologyInvalidLog = createLog("La carga de la hidrología actual falló", LOG_TYPE.WARNING);
         }
     }
-    
+    // tooltip es la barra de información que aparece al posar el mouse sobre una barra.
     const active = inodes[i].active === 1 ? "Si" : "No";
     let tooltip = generateTooltip(["Barra: " + inodes[i].nodeName.replace(/_/gi, " "), 
                                   "Activo: " + active, 

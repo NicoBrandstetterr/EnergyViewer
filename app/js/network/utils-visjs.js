@@ -250,10 +250,11 @@ function createBusImage(dirtyConfig, metrics) {
 		let formatConfig = {};
 		Object.assign(formatConfig,config);
 		// Setea el tamaño de la imagen
-		formatConfig.width = 80;
+		formatConfig.width = 55;
 		formatConfig.height = 10;
 		formatConfig.ypos = formatConfig.height*0.15;
 		formatConfig.barWidth = formatConfig.width-2*formatConfig.height;
+		
 		var i;
 		var svgComponents = [];
 		svgComponents.push('<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">');
