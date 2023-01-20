@@ -201,133 +201,182 @@ function fillDefaults(config) {
 
  */
  
+// function createBusImage(dirtyConfig, metrics) {
+	
+// 	if (typeof metrics === "undefined") {
+// 		metrics = {};
+// 	}
+	
+// 	// Calcula el cuantil [0, 6], con 0 menor que el mínimo, 6 más que el máximo
+// 	let val; 
+// 	let range;
+// 	let step;
+// 	// -1 es el cuantil por defecto, con negro.
+// 	let quantile = -1;
+	
+//     let numberOfQuantiles = CONFIG.NUMBER_OF_QUANTILES;
+		
+// 	if ($("#marginal-cost-toggle")[0].checked) {		
+// 		if (Object.keys(metrics).length > 0) {
+// 			val = metrics.costo_marginal.value;
+// 			if (val <= CONFIG.FAILURE_THRESHOLD) {
+// 				if (val < CONFIG.LOW_MARGINAL_COST) {
+// 					quantile = 0;
+// 				} if (val > CONFIG.HIGH_MARGINAL_COST) {
+// 					quantile = numberOfQuantiles;
+// 				} else {
+// 					range = CONFIG.HIGH_MARGINAL_COST - CONFIG.LOW_MARGINAL_COST;
+// 					step = range/numberOfQuantiles;
+// 					for (let i = 1; i <= numberOfQuantiles; i++) {
+// 						if (val < (CONFIG.LOW_MARGINAL_COST + i*step)) {
+// 							quantile = i;
+// 							break;
+// 						}
+// 					}
+// 				}
+// 			} else {
+// 				quantile = numberOfQuantiles+1;
+// 			}
+// 		}
+// 	}
+	
+// 	dirtyConfig.quantile = quantile;
+		
+// 	let config = fillDefaults(dirtyConfig);
+// 	const hash = JSON.stringify(config);
+	
+
+// 	if (!(hash in BusImages)) {
+// 		let formatConfig = {};
+// 		Object.assign(formatConfig,config);
+// 		// Setea el tamaño de la imagen
+// 		formatConfig.width = 80;
+// 		formatConfig.height = 10;
+// 		// formatConfig.ypos = formatConfig.height*0.15;
+// 		// formatConfig.barWidth = formatConfig.width-2*formatConfig.height;
+// 		formatConfig.ypos = formatConfig.height*0.15;
+// 		formatConfig.barWidth = formatConfig.width-2*formatConfig.height;
+// 		var i;
+// 		var svgComponents = [];
+// 		svgComponents.push('<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">');
+
+// 		// Dibuja la barra
+// 		svgComponents.push('<rect x="{height}" y="{ypos}" width="{barWidth}" height="70%" fill="{color}" stroke-width="1" stroke="#060606">');
+// 		//formatConfig.color = "rgba(" + getQuantileColor(config.quantile, numberOfQuantiles) + (config.selected?",1)":",0.8)");
+		
+// 		svgComponents.push('</rect>');
+		
+// 		// Muestra spikes para valores menos que el mínimo y más que el máximo
+// 		let width = formatConfig.width;
+// 		let height = formatConfig.height;
+// 		let arrowPoints = [];
+// 		// Flecha de entrada
+// 		formatConfig.radius = height*.3;
+// 		formatConfig.generatorCircleX = height*0.25
+// 		formatConfig.generatorCircleY = height*0.25
+		
+// 		if (config.hasGenerators) {
+
+// 			svgComponents.push('<polyline points="');
+// 			arrowPoints = [];
+
+// 			arrowPoints.push([height*.16,height*.3]);
+// 			arrowPoints.push([height*.76,height*.3]);
+// 			arrowPoints.push([height*.76,height*.1]);
+// 			arrowPoints.push([height*1.36,height*.5]);
+// 			arrowPoints.push([height*.76,height*.9]);
+// 			arrowPoints.push([height*.76,height*.7]);
+// 			arrowPoints.push([height*.16,height*.7]);
+//             arrowPoints.push([height*.16,height*.3]);
+// 			i = arrowPoints.length;
+// 			while (i--)
+// 				svgComponents.push(arrowPoints[i][0] + ',' + arrowPoints[i][1] + ' ');
+// 			svgComponents.push('" style="fill:lime;stroke:green;stroke-width:1;" />');
+// 		}
+		
+// 		// Flecha de salida
+// 		if (config.hasLoad) {
+// 			svgComponents.push('<polyline points="');
+// 			arrowPoints = []
+
+// 			arrowPoints.push([width-height*1.3,height*.3]);
+// 			arrowPoints.push([width-height*.7,height*.3]);
+// 			arrowPoints.push([width-height*.7,height*.1]);
+// 			arrowPoints.push([width-height*.1,height*.5]);
+// 			arrowPoints.push([width-height*.7,height*.9]);
+// 			arrowPoints.push([width-height*.7,height*.7]);
+// 			arrowPoints.push([width-height*1.3,height*.7]);
+//             arrowPoints.push([width-height*1.3,height*.3]);
+
+// 			i = arrowPoints.length;
+// 			while (i--)
+// 				svgComponents.push(arrowPoints[i][0] + ',' + arrowPoints[i][1] + ' ');
+// 			svgComponents.push('" style="fill:red;stroke:darkred;stroke-width:1;" />');
+// 		}
+		
+// 		// Label
+		
+// 		svgComponents.push('</svg>');
+		
+// 		var DOMURL = window.URL || window.webkitURL || window;
+
+// 		//console.log(svgComponents.join(svgComponents).formatUnicorn(config));
+// 		let svgString = svgComponents.join('').formatUnicorn(formatConfig);
+	
+// 		var svg = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+// 		BusImages[hash] = DOMURL.createObjectURL(svg);
+// 	}
+// 	return BusImages[hash];
+// }
+
 function createBusImage(dirtyConfig, metrics) {
-	
-	if (typeof metrics === "undefined") {
-		metrics = {};
-	}
-	
-	// Calcula el cuantil [0, 6], con 0 menor que el mínimo, 6 más que el máximo
-	let val; 
-	let range;
-	let step;
-	// -1 es el cuantil por defecto, con negro.
-	let quantile = -1;
-	
-    let numberOfQuantiles = CONFIG.NUMBER_OF_QUANTILES;
-		
-	if ($("#marginal-cost-toggle")[0].checked) {		
-		if (Object.keys(metrics).length > 0) {
-			val = metrics.costo_marginal.value;
-			if (val <= CONFIG.FAILURE_THRESHOLD) {
-				if (val < CONFIG.LOW_MARGINAL_COST) {
-					quantile = 0;
-				} if (val > CONFIG.HIGH_MARGINAL_COST) {
-					quantile = numberOfQuantiles;
-				} else {
-					range = CONFIG.HIGH_MARGINAL_COST - CONFIG.LOW_MARGINAL_COST;
-					step = range/numberOfQuantiles;
-					for (let i = 1; i <= numberOfQuantiles; i++) {
-						if (val < (CONFIG.LOW_MARGINAL_COST + i*step)) {
-							quantile = i;
-							break;
-						}
-					}
-				}
-			} else {
-				quantile = numberOfQuantiles+1;
-			}
-		}
-	}
-	
-	dirtyConfig.quantile = quantile;
-		
+	// if (typeof metrics === "undefined") {
+	// 	metrics = {};
+	// }
+	// // Calcula el cuantil [0, 6], con 0 menor que el mínimo, 6 más que el máximo
+	// let val;
+	// let range;
+	// let step;
+	// // -1 es el cuantil por defecto, con negro.
+	// let quantile = -1;
+	// let numberOfQuantiles = CONFIG.NUMBER_OF_QUANTILES;
+	// if ($("#marginal-cost-toggle")[0].checked) {
+	// 	if (Object.keys(metrics).length > 0) {
+	// 		val = metrics.costo_marginal.value;
+	// 		if (val <= CONFIG.FAILURE_THRESHOLD) {
+	// 			if (val < CONFIG.LOW_MARGINAL_COST) {
+	// 				quantile = 0;
+	// 			} if (val > CONFIG.HIGH_MARGINAL_COST) {
+	// 				quantile = numberOfQuantiles;
+	// 			} else {
+	// 				range = CONFIG.HIGH_MARGINAL_COST - CONFIG.LOW_MARGINAL_COST;
+	// 				step = range / numberOfQuantiles;
+	// 				for (let i = 1; i <= numberOfQuantiles; i++) {
+	// 					if (val < (CONFIG.LOW_MARGINAL_COST + i * step)) {
+	// 						quantile = i;
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 		} else {
+	// 			quantile = numberOfQuantiles + 1;
+	// 		}
+	// 	}
+	// }
+	// dirtyConfig.quantile = quantile;
 	let config = fillDefaults(dirtyConfig);
-	const hash = JSON.stringify(config);
-	
+	// const hash = JSON.stringify(config);
 
-	if (!(hash in BusImages)) {
-		let formatConfig = {};
-		Object.assign(formatConfig,config);
-		// Setea el tamaño de la imagen
-		formatConfig.width = 55;
-		formatConfig.height = 10;
-		formatConfig.ypos = formatConfig.height*0.15;
-		formatConfig.barWidth = formatConfig.width-2*formatConfig.height;
-		
-		var i;
-		var svgComponents = [];
-		svgComponents.push('<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">');
-		
-		// Dibuja la barra
-		svgComponents.push('<rect x="{height}" y="{ypos}" width="{barWidth}" height="70%" fill="{color}" stroke-width="1" stroke="#060606">');
-		
-		formatConfig.color = "rgba(" + getQuantileColor(config.quantile, numberOfQuantiles) + (config.selected?",1)":",0.8)");
-		
-		svgComponents.push('</rect>');
-		//data += '</circle>';
-		
-		// Muestra spikes para valores menos que el mínimo y más que el máximo
-		let width = formatConfig.width;
-		let height = formatConfig.height;
-		let arrowPoints = [];
-		// Flecha de entrada
-		formatConfig.radius = height*.3;
-		formatConfig.generatorCircleX = height*0.25
-		formatConfig.generatorCircleY = height*0.25
-
-		if (config.hasGenerators) {
-
-			svgComponents.push('<polyline points="');
-			arrowPoints = [];
-
-			arrowPoints.push([height*.16,height*.3]);
-			arrowPoints.push([height*.76,height*.3]);
-			arrowPoints.push([height*.76,height*.1]);
-			arrowPoints.push([height*1.36,height*.5]);
-			arrowPoints.push([height*.76,height*.9]);
-			arrowPoints.push([height*.76,height*.7]);
-			arrowPoints.push([height*.16,height*.7]);
-            arrowPoints.push([height*.16,height*.3]);
-			i = arrowPoints.length;
-			while (i--)
-				svgComponents.push(arrowPoints[i][0] + ',' + arrowPoints[i][1] + ' ');
-			svgComponents.push('" style="fill:lime;stroke:green;stroke-width:1;" />');
-		}
-		
-		// Flecha de salida
-		if (config.hasLoad) {
-			svgComponents.push('<polyline points="');
-			arrowPoints = []
-
-			arrowPoints.push([width-height*1.3,height*.3]);
-			arrowPoints.push([width-height*.7,height*.3]);
-			arrowPoints.push([width-height*.7,height*.1]);
-			arrowPoints.push([width-height*.1,height*.5]);
-			arrowPoints.push([width-height*.7,height*.9]);
-			arrowPoints.push([width-height*.7,height*.7]);
-			arrowPoints.push([width-height*1.3,height*.7]);
-            arrowPoints.push([width-height*1.3,height*.3]);
-
-			i = arrowPoints.length;
-			while (i--)
-				svgComponents.push(arrowPoints[i][0] + ',' + arrowPoints[i][1] + ' ');
-			svgComponents.push('" style="fill:red;stroke:darkred;stroke-width:1;" />');
-		}
-		
-		// Label
-		
-		svgComponents.push('</svg>');
-		
-		var DOMURL = window.URL || window.webkitURL || window;
-
-		//console.log(svgComponents.join(svgComponents).formatUnicorn(config));
-		let svgString = svgComponents.join('').formatUnicorn(formatConfig);
-	
-		var svg = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-		BusImages[hash] = DOMURL.createObjectURL(svg);
+	if (config.hasGenerators && config.hasLoad){
+		return "./resources/network/icons/bus/normal/bus_h_io.svg"
 	}
-	return BusImages[hash];
+	if (config.hasGenerators){
+		return "./resources/network/icons/bus/normal/bus_h_i.svg"
+	}
+	if (config.hasLoad){
+		return "./resources/network/icons/bus/normal/bus_h_o.svg"
+	}
+	return "./resources/network/icons/bus/normal/bus_h.svg"
 }
 
 logTime("utils-visjs.js");
