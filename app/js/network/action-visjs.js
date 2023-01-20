@@ -43,6 +43,7 @@ function generateNetwork(container, nodesInput, edgesInput, topologyType) {
  * 3: geo
  */
   console.log("se entro en generateNetwork")
+  let t0 = performance.now();
   // Variables para contruir el grafo.
   let network, nodes, edges;
 
@@ -143,6 +144,8 @@ function generateNetwork(container, nodesInput, edgesInput, topologyType) {
   } // TODO hacer lo mismo pero con junctions.
 
   // Retornamos las variables necesarias para poder actualizar los nodos y aristas.
+  let t1 = performance.now();
+  console.log("generateNetwork tardó " + (t1-t0) + " milisegundos.")
   return {network: network, nodes: nodes, edges: edges};
 }
 
@@ -155,6 +158,7 @@ function generateNetwork(container, nodesInput, edgesInput, topologyType) {
  */
 
 function enableDrag(network, container, nodes) {
+  let t0 = performance.now();
 	var rect = {}, drag = false;
   //Funcion que selecciona los nodos contenidos en el rectangulo
   function selectNodesFromHighlight(network, nodes) {
@@ -262,6 +266,8 @@ function enableDrag(network, container, nodes) {
   //network = new vis.Network(container, data, options);
   canvas = network.canvas.frame.canvas;
   visjsctx = canvas.getContext('2d');
-
+  
+  let t1 = performance.now();
+  console.log("enableDrag tardó " + (t1-t0) + " milisegundos.")
 }
 logTime("action-visjs.js");

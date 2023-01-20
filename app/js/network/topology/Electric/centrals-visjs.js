@@ -329,9 +329,7 @@ function addCentralsToMapNetwork(centrals){
 }
 
 
-
 function getCentralsUpdates() {
-
   let inodes;
   if (currentTopologyType === TOPOLOGY_TYPES.ELECTRIC)
     inodes = electricTopology.centrals;
@@ -342,77 +340,77 @@ function getCentralsUpdates() {
 
   let updates = [];
   let datosInvalidosLog;
-  
-  for (let i = 0; i < inodes.length; i++) {
+  /* Se cargan los datos de la barra seleccionada. */
+  let callBack = function (x,hydro,identificador) {
+    return function() {
+      if (x.readyState === 4){
+        let centralData = JSON.parse(x.responseText);
 
+        if(!(identificador in hydrologyTimes[hydro]['centrals'])) {
+          hydrologyTimes[hydro]['centrals'][identificador] = centralData;
+        }
+      }
+    };
+  };
+
+  /* Si los datos estan cargados se ejecuta este método. */
+  let preLoad = function (data) {};
+
+  inodes.forEach(function(inode) {
+    
     let currentCentralTime = {
       CenPgen: 0
     };
+    let inodesI = inode
 
-    /* Se cargan los datos de la barra seleccionada. */
-    let callBack = function (x) {
-      return function() {
-        if (x.readyState === 4){
-          let centralData = JSON.parse(x.responseText);
-
-          if(!(inodes[i].centralId in hydrologyTimes[chosenHydrology]['centrals'])) {
-            hydrologyTimes[chosenHydrology]['centrals'][inodes[i].centralId] = centralData;
-          }
-        }
-      };
-    };
-
-    /* Si los datos estan cargados se ejecuta este método. */
-    let preLoad = function (data) {};
 
     /* se cargan los datos y si existen se crea el gráfico. */
-    loadTypeFile(inodes[i].centralId, preLoad, callBack, chosenHydrology, 'centrals');
+    loadCenFile(inodesI.centralId, preLoad, callBack, chosenHydrology);
 
     // Verificar posibles errores
     if (chosenHydrology in hydrologyTimes && 'centrals' in hydrologyTimes[chosenHydrology]) {
-        if (inodes[i].centralId in hydrologyTimes[chosenHydrology].centrals) {
-            let tempCentral = hydrologyTimes[chosenHydrology].centrals[inodes[i].centralId][chosenTime];
+        if (inodesI.centralId in hydrologyTimes[chosenHydrology].centrals) {
+            let tempCentral = hydrologyTimes[chosenHydrology].centrals[inodesI.centralId][chosenTime];
             if (tempCentral !== undefined) {
                 currentCentralTime = tempCentral;
             } else {
                 if (typeof datosInvalidosLog === 'undefined') {
                     //datosInvalidosLog = createLog("La hidrologia " + chosenHydrology + " tiene centrales inválidas", LOG_TYPE.WARNING);
                 }
-                //addDetailsToLog(datosInvalidosLog, "La central " + inodes[i].nodeName + " no contiene datos válidos");
+                //addDetailsToLog(datosInvalidosLog, "La central " + inodesI.nodeName + " no contiene datos válidos");
             }
         } else {
             if (typeof datosInvalidosLog === 'undefined') {
                 //datosInvalidosLog = createLog("La hidrologia " + chosenHydrology + " tiene centrales inválidas", LOG_TYPE.WARNING);
             }
-            //addDetailsToLog(datosInvalidosLog, "La central " + inodes[i].nodeName + " no se encontró o se cargó incorrectamente");
+            //addDetailsToLog(datosInvalidosLog, "La central " + inodesI.nodeName + " no se encontró o se cargó incorrectamente");
         }
     }
-    
-    let capacity = parseFloat(inodes[i].capacity).toFixed(1);
-    let maxPower = parseFloat(inodes[i].max_power).toFixed(1);
+
+    let capacity = parseFloat(inodesI.capacity).toFixed(1);
+    let maxPower = parseFloat(inodesI.max_power).toFixed(1);
     let currentGeneration = parseFloat(currentCentralTime.CenPgen).toFixed(1);
 
-    let tooltip = generateTooltip(["Generador: " + inodes[i].nodeName,
-                                    "Tipo: " + inodes[i].tipo,
+    let tooltip = generateTooltip(["Generador: " + inodesI.nodeName,
+                                    "Tipo: " + inodesI.tipo,
                                     "Capacidad: " + capacity + " [MW]",
                                     "Generación máxima: " + maxPower + " [MW]",
                                     "Generación actual: " + currentGeneration + " [MW]"]);
     let generador =
       {
-        id: inodes[i].id,
+        id: inodesI.id,
         generation: currentCentralTime.CenPgen
       };
-
-    inodes[i].generation = currentCentralTime.CenPgen;
-    inodes[i].title = tooltip;
+    inodesI.generation = currentCentralTime.CenPgen;
+    inodesI.title = tooltip;
     generador.title = tooltip;
 
     updates.push(generador);
-  }
+
+  })
 
   return updates;
 }
-
 function updateCentrals(nodes){
   nodes.update(getCentralsUpdates());
 }

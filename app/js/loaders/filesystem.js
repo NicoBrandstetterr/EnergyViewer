@@ -175,10 +175,12 @@ function onInitFs (fs) {
 /**
 * Reviso el espacio disponible. Si es 0 pido memoria, de lo contrario simplemente abro el fileSystem.
 */
+
 fileSystem.checkSpace(
 	(result) => {
 		let initfs = (bytes) => window.requestFileSystem(PERSISTENT, bytes, onInitFs, fsErrorHandler);
 		if(result.total === 0){
+			console.log("Hola")
 			navigator.webkitPersistentStorage.requestQuota(10*1024*1024*1024, function(grantedBytes) {
 				console.log("Se acaba de crear un sistema de archivo de",grantedBytes/(1024*1024)/1024.0,"GB");
 				initfs(grantedBytes);

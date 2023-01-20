@@ -138,11 +138,13 @@ function loadBusFile(busId, noLoadAction , loadAction, hydro) {
 
   // verifico si los resultado ya fueron cargados.
   if(busId in hydrologyTimes[hydro].buses) {
+    console.log("preload loadbusfile");
     noLoadAction(hydrologyTimes[hydro].buses[busId]);
   } else {
     // cargo los datos que no fueron cargados previamente.
+    console.log("callback loadbusfile");
     let chartReq = new XMLHttpRequest();
-    chartReq.onreadystatechange = loadAction(chartReq, hydro);
+    chartReq.onreadystatechange = loadAction(chartReq, hydro,busId);
     try {
       chartReq.open("GET", getUrlByHydrology('buses', hydro) + getTypeToFileString('buses') + busId + ".json", false);
       chartReq.send();
@@ -154,6 +156,44 @@ function loadBusFile(busId, noLoadAction , loadAction, hydro) {
 
 /**
  *
+ * Se encarga de cargar datos de una barra y ejecutar la acción pedida con los datos cargados.
+ *
+ * @param cenId identificador de la barra
+ * @param noLoadAction función que se ejecuta si los datos estan ya cargados en el cache. Debe recibir un json con los resultados de esa barra.
+ * @param loadAction función que se ejecuta al cargar correctamente los datos. Debe recibir el xmlhttprequest por parámetro.
+ * @param hydro
+ *
+ */
+function loadCenFile(cenId, noLoadAction , loadAction, hydro) {
+
+  if(typeof hydro === 'undefined') hydro = chosenHydrology;
+
+  // Verifica si esta la estructura de datos necesaria.
+  checkHydrologyTimes(hydro);
+
+  // verifico si los resultado ya fueron cargados.
+  if(cenId in hydrologyTimes[hydro].centrals) {
+    console.log("preload loadcenfile");
+    noLoadAction(hydrologyTimes[hydro].centrals[cenId]);
+  } else {
+    // cargo los datos que no fueron cargados previamente.
+    console.log("callback loadcenfile");
+    let chartReq = new XMLHttpRequest();
+    chartReq.onreadystatechange = loadAction(chartReq, hydro,cenId);
+    try {
+      chartReq.open("GET", getUrlByHydrology('centrals', hydro) + getTypeToFileString('centrals') + cenId + ".json", false);
+      chartReq.send();
+    } catch (err) {
+      createLog('El archivo de resultados de la central ' + cenId + " no existe", LOG_TYPE.ERROR);
+    }
+  }
+}
+
+
+
+
+/**
+ *
  * Se encarga de cargar datos de un elemento y ejecutar la acción pedida con los datos cargados.
  *
  * @param elementId id del elemento a cargar
@@ -162,18 +202,29 @@ function loadBusFile(busId, noLoadAction , loadAction, hydro) {
  * @param hydro hidrología a cargar, en caso de no estar definida se usa la que esta en el momento.
  * @param typeId tipo de dato a cargar ('buses', 'lines', 'centrals', 'reservoirs')
  */
-function loadTypeFile(elementId, noLoadAction, loadAction, hydro, typeId){
+function loadTypeFile(elementId, noLoadAction, loadAction, hydro, typeId,a=2){
   // console.log("pasando por modulo hydrology-loader función LoadTypeFile")
-  if(typeof hydro === 'undefined') hydro = chosenHydrology;
+  let t0 = performance.now();
 
+  if(typeof hydro === 'undefined') hydro = chosenHydrology;
+  let t1 = performance.now();
+  if (a === 0){
+    console.log("t1 tardó " + (t1-t0) + " milisegundos.")
+  }
   // Verifica si esta la estructura de datos necesaria.
   checkHydrologyTimes(hydro);
-
+  let t2 = performance.now();
+  if (a === 0){
+    console.log("t2 tardó " + (t2-t1) + " milisegundos.")
+  }
   // verifico si los resultado ya fueron cargados.
   if(elementId in hydrologyTimes[hydro][typeId]) {
+    // console.log("preLoad loadtypefile")
     noLoadAction(hydrologyTimes[hydro][typeId][elementId]);
-  } else {
+  } 
+  else {
     // cargo los datos que no fueron cargados previamente.
+    // console.log("callback loadtypefile")
     let chartReq = new XMLHttpRequest();
     chartReq.onreadystatechange = loadAction(chartReq, hydro);
     try {
@@ -186,6 +237,10 @@ function loadTypeFile(elementId, noLoadAction, loadAction, hydro, typeId){
       // Se muestra en pantalla si existió algún tipo de error.
       createLog('El archivo de resultados ' + getTypeToString(typeId) + ' ' + elementId + " no existe", LOG_TYPE.ERROR);
     }
+  }
+  let t4 = performance.now();
+  if (a === 0){
+    console.log("t4 tardó " + (t4-t2) + " milisegundos.")
   }
 }
 

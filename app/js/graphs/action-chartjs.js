@@ -132,8 +132,9 @@ function loadFunctions(canvas,title, type, bkgCol, bdrCol, txt, lblStrX, lblStrY
  * @param hydro Número de la hidrología
  */
 function generateGenerationChart(canvas, selectedElement, type, PDTO, centralName, centralType, hydro) {
-	console.log("pasando por generateGenerationChart")
-	console.log(selectedElement);
+	console.log("pasando por generateGenerationChart");
+	console.log("selected element: ",selectedElement);
+  console.log("pdto: ",PDTO);
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
   let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
@@ -143,7 +144,7 @@ function generateGenerationChart(canvas, selectedElement, type, PDTO, centralNam
   row.id = "row_" + containerID;
 
   if( chosenHydrology == null) chosenHydrology = 1;
-  console.log(chosenHydrology); 
+  console.log("hidrologia actual: ",chosenHydrology); 
   let title = "H" + chosenHydrology;
   let colorBkg;
   

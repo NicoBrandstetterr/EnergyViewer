@@ -62,7 +62,9 @@ function parseBuses(buses, electricTopology, type) {
 
   const busesLog = createLog("Creando barras en la red " + typeToString);
   let badCoordinatesLog = null;
-
+  let t0 = performance.now();
+  let List = [[],[],[],[],[],[],[],[],[]];
+  console.log("buses.length: ", buses.length)
   for (i = 0; i < buses.length; i++) {
 
     // Variable para dejar en el label si esta activo en forma intuitiva.
@@ -73,17 +75,21 @@ function parseBuses(buses, electricTopology, type) {
       DemBarE: 'undefined',
       DemBarP: 'undefined'
     };
-    
+    let T0 = performance.now();
     // Agregamos la barra al diccionario para linkearla a sus generadores.
     dictBarras[buses[i].id] = {
       indice: i
     };
-
+    let T1 = performance.now();
+    List[0].push(T1-T0);
     // Guardamos el id maximo para no topar entre id de generador y id de barra
     maxid = Math.max(buses[i].id, maxid);
-    const hasLoad = getBusLoad(buses[i].id);
+    let T2 = performance.now();
+    List[1].push(T2-T1);
+    const hasLoad = getBusLoad(buses[i].id,i);
     const hasGenerators = false;
-
+    let T3 = performance.now();
+    List[2].push(T3-T2);
     // Creamos el nodo de la barra con sus caracteristicas correspondientes.
     let barra = {
       id: buses[i].id,
@@ -108,22 +114,27 @@ function parseBuses(buses, electricTopology, type) {
 	  hasLoad: hasLoad,
 	  hasGenerators: hasGenerators
     };
-	
+    let T4 = performance.now();
+    List[3].push(T4-T3);
 	let imageConfig = {
 		hasLoad: hasLoad,
 		hasGenerators: hasGenerators,
 		label: barra.nodeName
 	};
-	
+	let T5 = performance.now();
+  List[4].push(T5-T4);
 	barra.image = {};
 	barra.image.unselected = createBusImage(imageConfig);
 	imageConfig.selected = true;
 	barra.image.selected = createBusImage(imageConfig);
+  let T6 = performance.now();
+  List[5].push(T6-T5);
 
     barra.x = buses[i].longitude * -escala;
     barra.y = buses[i].latitude * escala;
     barra.validCoords = !(zero(barra.x) && zero(barra.y));
-	
+	let T7 = performance.now();
+  List[6].push(T7-T6);
 	// Solo se entra si no es el grafo del mapa. para mantener coordenadas.
     if (type === TOPOLOGY_TYPES.ELECTRIC) {
       if (barra.validCoords) {
@@ -143,7 +154,8 @@ function parseBuses(buses, electricTopology, type) {
 			});
       }
     }
-
+  let T8 = performance.now();
+  List[7].push(T8-T7);
     // Agrega la barra al grafo.
     electricTopology.buses.push(barra);
     const bid = buses[i].id;
@@ -172,8 +184,16 @@ function parseBuses(buses, electricTopology, type) {
         }))(bid)
   		}
 	 );
-	
+	let T9 = performance.now()
+  List[8].push(T9-T8);
   }
+  for (let i = 0; i < List.length; i++) {
+    let suma = List[i].reduce((a,b) => a+b);
+    console.log(`La suma de la lista ${i+1} es: ${suma}`);
+  }
+
+  let t1 = performance.now();
+  console.log("parseBus despues de for linea 66 tardó " + (t1-t0) + " milisegundos.")
   // Se ajustan para tener el grafo más parecido al mapa.
   if(type === TOPOLOGY_TYPES.ELECTRIC){
     totalx /= validbars;
@@ -224,6 +244,21 @@ function getNodesUpdates(){
   let updates = [];
   let datosInvalidosLog;
   let hydrologyInvalidLog;
+  /* Se cargan los datos de la barra seleccionada. */
+  
+  let callBack = function (x,hydro,identificador) {
+    return function() {
+      if (x.readyState === 4){
+        let busData = JSON.parse(x.responseText);
+        if(!(identificador in hydrologyTimes[hydro]['buses'])) {
+          hydrologyTimes[hydro]['buses'][identificador] = busData;
+        }
+      }
+    };
+  };
+
+  /* Si los datos estan cargados se ejecuta este método. */
+  let preLoad = function (data) {};
   
   for (let i = 0; i < inodes.length; i++) {
 
@@ -233,25 +268,8 @@ function getNodesUpdates(){
       DemBarP: 0
     };
 
-
-    /* Se cargan los datos de la barra seleccionada. */
-    let callBack = function (x) {
-      return function() {
-        if (x.readyState === 4){
-          let busData = JSON.parse(x.responseText);
-
-          if(!(inodes[i].id in hydrologyTimes[chosenHydrology]['buses'])) {
-            hydrologyTimes[chosenHydrology]['buses'][inodes[i].id] = busData;
-          }
-        }
-      };
-    };
-
-    /* Si los datos estan cargados se ejecuta este método. */
-    let preLoad = function (data) {};
-
     /* se cargan los datos y si existen se crea el gráfico. */
-    loadTypeFile(inodes[i].id, preLoad, callBack, chosenHydrology, 'buses');
+    loadBusFile(inodes[i].id, preLoad, callBack, chosenHydrology);
 
     // Verificar posibles errores
     if (chosenHydrology in hydrologyTimes && 'buses' in hydrologyTimes[chosenHydrology]) {
@@ -276,6 +294,7 @@ function getNodesUpdates(){
             hydrologyInvalidLog = createLog("La carga de la hidrología actual falló", LOG_TYPE.WARNING);
         }
     }
+
     // tooltip es la barra de información que aparece al posar el mouse sobre una barra.
     const active = inodes[i].active === 1 ? "Si" : "No";
     let tooltip = generateTooltip(["Barra: " + inodes[i].nodeName.replace(/_/gi, " "), 
@@ -349,7 +368,10 @@ function updateBuses(nodes){
  * @param busID Identificador de la barra
  * @returns {boolean} true si los datos están cargados, false si no.
  */
-function getBusLoad(busID){
+function getBusLoad(busID,a=2){
+// console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+// console.log("Entrando a getBusLoad");
+let t0 = performance.now();
 
   if (CONFIG.RESULTS_DISABLED) return;
   let busLoad=false;
@@ -384,8 +406,15 @@ function getBusLoad(busID){
     }
   };
 
-  loadTypeFile(busID, preLoad, callBack, chosenHydrology, 'buses');
-
+  let t1 = performance.now();
+  loadBusFile(busID, preLoad, callBack, chosenHydrology);
+  let t2 = performance.now();
+  if (a === 0){
+    console.log("primera parte getBusLoad tardó " + (t1-t0) + " milisegundos.")
+    console.log("loadBusFile tardó " + (t2-t1) + " milisegundos.")
+  }
+  
+  // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
   return busLoad;
 }
 

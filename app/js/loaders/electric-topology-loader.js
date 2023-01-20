@@ -12,13 +12,23 @@ var gReq = new XMLHttpRequest();
 var busInfo;
 
 gReq.onreadystatechange = function () {
+  
   if (this.readyState === 4) {
+    let t0 = performance.now();
     generators = JSON.parse(this.responseText);
 	  createLog('Archivo de generadores leído', LOG_TYPE.SUCCESS)
     console.log("pasando por gReq.onreadystatechange")
+    let t1 = performance.now();
+    // console.log("generators = JSON.parse(this.responseText); tardó " + (t1 - t0) + " milisegundos.")
     loadElectricTopology(buses, lines, generators);
+    let t2 = performance.now();
+    // console.log("loadElectricTopology tardó " + (t2 - t1) + " milisegundos.")
     parseElectricTopologyToNetwork();
+    let t3 = performance.now();
+    // console.log("parseElectricTopologyToNetwork tardó " + (t3 - t2) + " milisegundos.")
     addDataToMapNetwork();
+    let t4 = performance.now();
+    // console.log("addDataToMapNetwork tardó " + (t4 - t3) + " milisegundos.")
     console.log("Se viene creacion red electrica")
     var result = generateNetwork(electricContainer, nodesArray, edgesArray, TOPOLOGY_TYPES.ELECTRIC);
 	  createLog('Red eléctrica generada correctamente!', LOG_TYPE.SUCCESS)
@@ -34,30 +44,47 @@ gReq.onreadystatechange = function () {
     enableDrag(geoNetwork, $('#my-geo-network'), geoNodes);
     toElectricView();
     enableDrag(electricNetwork, $('#my-electric-network'), electricNodes);
+    let t5 = performance.now();
+    // console.log("final de greq tardó " + (t5-t4) + " milisegundos.")
+    console.log("total de greq tardó " + (t5-t0) + " milisegundos.")
+    
+    
   }
 };
 
 lReq.onreadystatechange = function () {
   
   if (this.readyState === 4) {
+    let t0 = performance.now();
     console.log("pasando por lReq.onreadystatechange")
     lines = JSON.parse(this.responseText);
     if(!CONFIG.RESULTS_DISABLED) loadLinesFiles();
     createLog('Archivo de líneas leído', LOG_TYPE.SUCCESS);
     gReq.open("GET", CONFIG.URL_CENTRALS, false);
     gReq.send();
+    let t1 = performance.now();
+    console.log("final de lreq tardó " + (t1-t0) + " milisegundos.")
   }
 };
 
 bReq.onreadystatechange = function () {
   
   if (this.readyState === 4) {
+    
     console.log("pasando por bReq.onreadystatechange")
+    let t0 = performance.now();
     buses = JSON.parse(this.responseText);
 	  createLog('Archivo de barras leído', LOG_TYPE.SUCCESS)
+    let t1 = performance.now();
+    // console.log("El código breq 1 tardó " + (t1 - t0) + " milisegundos.")
     lReq.open("GET", CONFIG.URL_LINES, false);
     lReq.send();
+    let t2 = performance.now();
+    // console.log("El código breq 2 tardó " + (t2 - t1) + " milisegundos.")
+    console.log("final de breq  tardó " + (t2 - t0) + " milisegundos.")
+
   }
+  
 };
 
 bReq.open("GET", CONFIG.URL_BUSES, false);

@@ -24,7 +24,10 @@ function showFiles(){
  * Actualiza los datos en el network (grafo) según la hidrología elegida en el select.
  */
 function updateHydrology() {
-  var time = getCurrentTime();
+  console.log("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+  console.log("Pasando por UpdateHydrology")
+  let t0 = performance.now();
+  
 
   var select = document.getElementById("hydrology-picker");
   
@@ -33,28 +36,34 @@ function updateHydrology() {
 //   console.log("Tiempo en obtener valores del select: ",time-getCurrentTime(),"ms")
 
   // Cargamos los archivos necesarios
-  time=getCurrentTime();
+  let t1 = performance.now();
+  console.log("updateHydrology chosenHydrology = parseInt(select.options[select.selectedIndex].value); tardó " + (t1-t0) + " milisegundos.")
   loadLinesFiles();
-//   console.log("loadlinesfiles: ",time-getCurrentTime(),"ms")
+  let t2 = performance.now();
+  console.log("updateHydrology loadLinesFiles tardó " + (t2-t1) + " milisegundos.")
   
   // Actualizamos los datos en los tooltip
-  time=getCurrentTime();
+
   updateLines(currentEdges);
-//   console.log("updateLines: ",time-getCurrentTime(),"ms")
+  let t3 = performance.now();
+  console.log("updateHydrology updateLines tardó " + (t3-t2) + " milisegundos.")
 
-  time=getCurrentTime();
   updateBuses(currentNodes);
-//   console.log("updateBuses: ",time-getCurrentTime(),"ms")
+  let t4 = performance.now();
+  console.log("updateHydrology updateBuses tardó " + (t4-t3) + " milisegundos.")
   
-  time=getCurrentTime();
-  updateCentrals(currentNodes);
-//   console.log("updateCentrals: ",time-getCurrentTime(),"ms")
 
-  time=getCurrentTime();
+  // updateCentrals(currentNodes); 
+  let t5 = performance.now();
+  // console.log("updateHydrology updateCentrals tardó " + (t5-t4) + " milisegundos.")
+
+
   // Cambiamos la ruta de los archivos.
   changeConfigHydrology();
-//   console.log("changeConfigHydrology: ",time-getCurrentTime(),"ms")
-
+  let t6 = performance.now();
+  console.log("updateHydrology changeConfigHydrology tardó " + (t6-t5) + " milisegundos.")
+  console.log("updateHydrology En TOTAL tardó " + (t6-t0) + " milisegundos.")
+  console.log("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
 }
 
 logTime("action-load.js");

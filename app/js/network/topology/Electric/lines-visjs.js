@@ -7,6 +7,7 @@
 // Existe una letiable lines en donde se cargan los datos de las líneas previamente.
 function parseLines(lines, electricTopology) {
   console.log("pasando por parseLines")
+  let t0 = performance.now();
   // Formamos todas las aristas del grafo que estan representadas por las líneas electricas.
   // Cada arista es de la forma {from: idOrigen, to: idDestino}
 
@@ -122,7 +123,8 @@ function parseLines(lines, electricTopology) {
     electricTopology.lines.push(linea);
     electricMapTopology.lines.push(linea);
   }
-  
+  let t1 = performance.now();
+  console.log("parselines tardó " + (t1-t0) + " milisegundos.")
   //console.log("despues electricTopology=",electricTopology);
 
 }
@@ -144,6 +146,7 @@ function addLinesToMapNetwork(lines){
 
 function getUpdates(){
   console.log("pasando por modulo lines-visjs función getupdates")
+  let t0 = performance.now();
   let iedges;
   if (currentTopologyType === TOPOLOGY_TYPES.ELECTRIC)
     iedges = electricTopology.lines;
@@ -231,11 +234,13 @@ function getUpdates(){
 
     updates.push(edge);
   }
-
+  let t1 = performance.now();
+  // console.log("getUpdates tardó " + (t1-t0) + " milisegundos.")
   return updates;
 }
 
 function updateLines(edges){
+  console.log("Pasando por updateLines")
   edges.update(getUpdates());
 }
 

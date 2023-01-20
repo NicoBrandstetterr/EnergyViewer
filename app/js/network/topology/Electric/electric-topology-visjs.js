@@ -19,11 +19,24 @@ var electricMapTopology = {
 function loadElectricTopology(buses, lines, centrals){
   console.log("pasando por loadElectricTopology")
   // Parseamos las variables recibidas.
+  let t0 = performance.now();
+  console.log("----------------------------------------------------------------")
   parseBuses(buses, electricTopology, TOPOLOGY_TYPES.ELECTRIC);
+  let t1 = performance.now();
+  console.log("parseBuses electrictopology tardó " + (t1-t0) + " milisegundos.")
+  console.log("----------------------------------------------------------------")
   parseBuses(buses, electricMapTopology, TOPOLOGY_TYPES.GEO);
+  let t2 = performance.now();
+  console.log("parseBuses geoTopology tardó " + (t2-t1) + " milisegundos.")
   parseLines(lines, electricTopology);
+  let t3=performance.now()
   parseCentrals(centrals, electricTopology, TOPOLOGY_TYPES.ELECTRIC);
+  let t4 = performance.now();
+  console.log("parseCentrals electricTopology tardó " + (t4-t3) + " milisegundos.")
   parseCentrals(centrals, electricMapTopology, TOPOLOGY_TYPES.GEO);
+  let t5 = performance.now();
+  console.log("parseCentrals geoTopology tardó " + (t5-t4) + " milisegundos.")
+  console.log("loadElectricTopology tardó " + (t5 - t0) + " milisegundos.")
 }
 
 function parseElectricTopologyToNetwork(){
@@ -31,6 +44,7 @@ function parseElectricTopologyToNetwork(){
  // nodesArray = [];
  // edgesArray = [];
   console.log("pasando por parseElectricTopologyToNetwork")
+  let t0 = performance.now();
   addBusesToNetwork(electricTopology.buses);
   addLinesToNetwork(electricTopology.lines);
   addCentralsToNetwork(electricTopology.centrals);
@@ -64,14 +78,18 @@ function parseElectricTopologyToNetwork(){
                   " se encuentra disconexa",
         fun: () => {if(currentTopologyType === TOPOLOGY_TYPES.ELECTRIC) goToNode(electricNetwork, electricNodes, loners[id])}});
   }
+  let t1 = performance.now();
+  console.log("parseElectricTopologyToNetwork tardó " + (t1-t0) + " milisegundos.")
 }
 
 function addDataToMapNetwork(){
+  let t0 = performance.now();
   console.log("pasando por addDataToMapNetwork")
   addBusesToMapNetwork(electricMapTopology.buses);
   addLinesToMapNetwork(electricMapTopology.lines);
   addCentralsToMapNetwork(electricMapTopology.centrals);
-
+  let t1 = performance.now();
+  console.log("addDataToMapNetwork tardó " + (t1-t0) + " milisegundos.")
 
 }
 
