@@ -260,64 +260,29 @@ function generatePiledGraph(canvas, selectedElement, type, PDTO, centrals, busNa
  */
 function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
   console.log("pasando por generateSystemPiledGraph en modulo action-chartjs")
-  let xAxis = PDTO.idX;
-  let yAxis = PDTO.idY;
-  let containerID = 'chart' + '-Sistema' + '-' + xAxis + '-' + yAxis;
-
-  canvas.id = "canvas_" + containerID;
-  let row = canvas.parent().parent();
-  row.id = "row_" + containerID;
-
-  let  lblStrX="Tiempo [bloques]";
-  let  lblStrY="Generación [MW]";
-  let centralsData = {};
-
-  let setDeDatos = [];
-  let xlabel = [];
-
-  let centrals = currentNodes.get({
-    filter: function (item) {
-      return (item.category === 'central');
+  let jsonUrl=CONFIG.PILED_GENERATION_GRAPH_FOLDER+'generation_system_'+hydroNum.toString()+'.json';
+  console.log("jsonURL: ",jsonUrl)
+  let request = new XMLHttpRequest();
+  request.open('GET', jsonUrl, false);
+  request.onreadystatechange = function(){
+    if (this.readyState === 4){
+      let xAxis = PDTO.idX;
+      let yAxis = PDTO.idY;
+      let containerID = 'chart' + '-Sistema' + '-' + xAxis + '-' + yAxis;
+      canvas.id = "canvas_" + containerID;
+      let row = canvas.parent().parent();
+      row.id = "row_" + containerID;
+      let  lblStrX="Tiempo [bloques]";
+      let  lblStrY="Generación [MW]";
+      let centralsData = JSON.parse(this.responseText);
+      let setDeDatos = [];
+      let xlabel = [];
+      addDataSets(centralsData, xAxis, yAxis, setDeDatos, xlabel);
+      setUpChart(canvas, xlabel, type, setDeDatos, 'Generación del sistema', lblStrX, lblStrY, 'Sistema', PDTO);
     }
-  });
-
-  /* Se cargan los datos de la barra seleccionada. */
-  let callBack = function(m, id) {
-    // console.log("pasando por callBack de generateSystemPiledGraph")
-    return function (x) {
-      return function() {
-        if (x.readyState === 4){
-
-          const cData = JSON.parse(x.responseText);
-
-          if(!(id in hydrologyTimes[chosenHydrology]['centrals'])) {
-            hydrologyTimes[chosenHydrology]['centrals'][id] = cData;
-          }
-
-          addCentralData(cData, m, centralsData, yAxis);
-        }
-      };
-    }
-  };
-
-  /* Si los datos estan cargados se ejecuta este método. */
-  let preLoad = function (m) {
-    // console.log("pasando por preload de generateSystemPiledGraph")
-    return function (data) {
-      addCentralData(data, m, centralsData, yAxis);
-    }
-  };
-  console.log("Cargando datos y si es que existen crando grafico usando funciones addCentralData y loadTypeFile")
-  for (let i = 0; i < centrals.length; i++) {
-    /* se cargan los datos y si existen se crea el gráfico. */
-    // console.log("Mostrando datos centrals[i]: ", centrals[i])
-    loadTypeFile(centrals[i].centralId, preLoad(centrals[i].tipo), callBack(centrals[i].tipo, centrals[i].centralId), hydroNum, 'centrals');
   }
+  request.send();
 
-  //addDataSets(centralsData);
-  console.log("Se presenta, previo a addDataSets, los valores yAxis: ", yAxis)
-  addDataSets(centralsData, xAxis, yAxis, setDeDatos, xlabel);
-  setUpChart(canvas, xlabel, type, setDeDatos, 'Generación del sistema', lblStrX, lblStrY, 'Sistema', PDTO);
 }
 
 
@@ -588,8 +553,6 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
           console.log("Se entro al readystate===4")
           let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
           canvas.attr("id","canvas_" + containerID);
-
-          console.log("presentando canvas mod: ", canvas)
           
           let title = "Percentil_MC"; // Título en negritas del gráfico.
           let newColor = randomColor();

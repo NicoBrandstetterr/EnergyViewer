@@ -37,8 +37,9 @@ var CONFIG =
     "CENTRALS_FOLDER"               : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/{hydrology}/Centrals/",
     "LINES_FOLDER"                  : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/{hydrology}/Lines/",
     "RESERVOIRS_FOLDER"             : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/{hydrology}/Reservoirs/",
-    "PERCENTIL_MARGINAL_COST_FOLDER":BASE_FOLDER_NAME + MODEL_FOLDER_NAME  + "/Scenarios/Marginal_cost_percentil/",
-    "PERCENTIL_FLOW_LINE_FOLDER"    :BASE_FOLDER_NAME + MODEL_FOLDER_NAME  + "/Scenarios/Flow_Line_percentil/",
+    "PERCENTIL_MARGINAL_COST_FOLDER": BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/Marginal_cost_percentil/",
+    "PERCENTIL_FLOW_LINE_FOLDER"    : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/Flow_Line_percentil/",
+    "PILED_GENERATION_GRAPH_FOLDER" : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/Generation_system/",
 
     "LOW_MARGINAL_COST"             : 10,
     "HIGH_MARGINAL_COST"            : 200,
