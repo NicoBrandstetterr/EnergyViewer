@@ -1,7 +1,11 @@
 #logo-centro-energia {
-    vertical-align: middle;
-    margin: -5px 20px 0px 0px;
-    width: 200px;
+    margin: 0 0 0 0;
+    width: 180px;
+}
+
+.mini-logo {
+    height: 40px;
+    width: auto;
 }
 
 input[type=file] {

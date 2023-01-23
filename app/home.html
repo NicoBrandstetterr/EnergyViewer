@@ -25,20 +25,39 @@
     <div class="container">
         <!-- About Modal -->
         <div id="home">
-            <div class="modal-dialog modal-sm center-dialog ">
+            <div class="home-dialog modal-sm center-dialog ">
 
                 <!-- Modal content-->
                 <div class="modal-content home-body">
                     <div class="modal-header center-header">
                         <div class="navbar-brand logo">
-                            <img id="logo-centro-energia" src="resources/logo.png" />
+                            <a href="https://centroenergia.cl/">
+                                <img id="logo-centro-energia" src="resources/logo.png" alt="logo centro de energía"/>
+                            </a>
                         </div>
-                        <h4 class="home-title">Administrar Proyectos</h4>
                     </div>
                     <div class="modal-header center-header">
+                        <h3 class="home-title">Administrador de Proyectos</h4>
+                    </div>
+
+                    <!-- <div class="modal-header center-header">
                         <img class="new-project-image" id="logo-nuevo-proyecto" onclick="$('#newProjectModal').modal();" src="resources/home/newProject.png" hspace="10"/>
 
                         <button id="new-project-btn" onclick="$('#newProjectModal').modal();" class="btn btn-primary new-project-button" type="button">Nuevo Proyecto</button>
+                    </div> -->
+
+                    <div class="center-header user-header">
+                        Usuario:
+                        <input id="user-input" class="form-control user-input" type="text">
+                        <button class="my-button" onclick="onFSReady()">
+                            <img src="resources/home/enter.png">
+                        </button>
+                    </div>
+                    <div class="modal-header center-header">
+                        <button id="new-project-btn" onclick="$('#newProjectModal').modal();" class="btn btn-primary new-project-button" type="button">
+                            <img class="new-project-image" id="logo-nuevo-proyecto" src="resources/home/newProject.png" hspace="10"/>
+                            Nuevo Proyecto
+                        </button>
                     </div>
                     <div id="existing-projects" class="modal-body">
                     </div>
@@ -59,20 +78,37 @@
                     </div>
 
                     <div class="modal-body">
-                        <div class="form-group">
-                            <div class="input-group input-file">
-                                <input id="inputName" class="form-control" type="text">
-                                <span class="input-group-btn">
-                                    <button onclick="createNewProject();" class="btn btn-primary" type="button">Aceptar</button>
-                                </span>
-                                <span class="input-group-btn">
-                                    <button onclick="closeModal('newProjectModal');" class="btn btn-primary" type="button">Cancelar</button>
-                                </span>
+                        <input id="inputName" class="form-control" type="text">
+                    </div>
 
+                    <div class="modal-header">
+                        <h4 class="modal-title text-primary">Descripción:</h4>
+                    </div>
 
-                            </div>
-                            <br>
-                            <div id="valid"><p style="color:red;" align="center"></p></div>
+                    <div class="modal-body">
+                        <textarea id="project-description" rows="4" spellcheck="false" class="form-control"></textarea>
+                    </div>
+
+                    <div class="modal-header">
+                        <h4 class="modal-title text-primary">Categoría:</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="labels" class="labels""></div>
+                    </div>
+                    <div class="modal-body">
+                        <div style="text-align:right">
+                            <span class="btn">
+                                <button onclick="createNewProject();" class="btn btn-primary" type="button">
+                                    <img class="new-project-image" src="resources/home/check.png" />
+                                    Aceptar
+                                </button>
+                            </span>
+                            <span class="btn">
+                                <button onclick="closeModal('newProjectModal');" class="btn btn-primary" type="button">
+                                    <img class="new-project-image" src="resources/home/close.png" />
+                                    Cancelar
+                                </button>
+                            </span>
                         </div>
                     </div>
                 </div>
