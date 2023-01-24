@@ -194,7 +194,21 @@ function addGraphEvents(myChart, PDTO, selectedElement) {
 function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
                          labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO,elementO=null) {
   console.log("pasando por SetUpSingleData")
-  
+  let indhor;
+  let requestindhor = new XMLHttpRequest();
+  requestindhor.open('GET', CONFIG.URL_INDHOR, false);
+  requestindhor.onreadystatechange = function() {
+    if (this.readyState === 4){
+      console.log("Pasando por indhor");
+      indhor = JSON.parse(this.responseText);
+      for (var i = 0; i < indhor.length; i++) {
+      indhor[i][0] = parseInt(indhor[i][0]);
+      indhor[i][1] = parseInt(indhor[i][1]);
+      }
+    }
+  }
+requestindhor.send();
+console.log("indhor: ",indhor);
   if(elementO===null ) {
 
     let xlabel = [];
@@ -243,8 +257,19 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
   
         tooltips: {
           mode: 'index',
-          intersect: false
-        },
+          intersect: false,
+        
+          callbacks: {
+              beforeTitle: function(tooltipItem,data){
+                return 'Bloque: '+data.labels[tooltipItem[0].index]
+              },
+              label: function(tooltipItem, data) {
+                  var datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
+                  var label = datasetLabel + ': ' + tooltipItem.yLabel;
+                  return label;
+              }
+          }
+      },
         hover: {
           mode: 'index',
           intersect: false
@@ -270,7 +295,15 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
               labelString: labelStrX
             },
             ticks: {
-              beginAtZero: true
+              beginAtZero: true,
+              callback: function(index) {
+                for (var i = 0; i < indhor.length; i++) {
+                    if (index >= indhor[i][0] && index <= indhor[i][1]) {
+                        return indhor[i][2];
+                    }
+                }
+                return "";
+            }
             }
           }]
         },
@@ -285,7 +318,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
     $(window).resize(function() {
       myChart.resize();
     });
-    console.log("configsss: ",config.data.datasets, typeof config.data.datasets, config.data.datasets.length)
+    // console.log("configsss: ",config.data.datasets, typeof config.data.datasets, config.data.datasets.length)
     
     // Se agregan eventos con respecto al grafico creado.
     addGraphEvents(myChart, PDTO, selectedElement);
@@ -363,8 +396,19 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
   
         tooltips: {
           mode: 'index',
-          intersect: false
-        },
+          intersect: false,
+        
+          callbacks: {
+            beforeTitle: function(tooltipItem,data){
+              return 'Bloque: '+data.labels[tooltipItem[0].index]
+            },
+              label: function(tooltipItem, data) {
+                  var datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
+                  var label = datasetLabel + ': ' + tooltipItem.yLabel;
+                  return label;
+              }
+          }
+      },
         hover: {
           mode: 'index',
           intersect: false
@@ -390,7 +434,15 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
               labelString: labelStrX
             },
             ticks: {
-              beginAtZero: true
+              beginAtZero: true,
+              callback: function(index) {
+                for (var i = 0; i < indhor.length; i++) {
+                    if (index >= indhor[i][0] && index <= indhor[i][1]) {
+                        return indhor[i][2];
+                    }
+                }
+                return "";
+            }
             }
           }]
         },

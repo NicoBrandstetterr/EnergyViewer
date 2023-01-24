@@ -31,6 +31,7 @@ var CONFIG =
     "URL_SHAPE_BASIC"               : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Topology/shape.json",
     "URL_SHAPE_DETAILED"            : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Topology/shapeDetails.json",
     "URL_HYDROLOGIES"               : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/hydrologies.json",
+    "URL_INDHOR"                    : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/indhor.json",
 
     "SCENARIOS_FOLDER"              : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/",
     "BUSES_FOLDER"                  : BASE_FOLDER_NAME + MODEL_FOLDER_NAME + "/Scenarios/{hydrology}/Bus/",

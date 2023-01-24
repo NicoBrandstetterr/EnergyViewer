@@ -15,7 +15,21 @@
 function setUpChart(canvas, xlabel, type, dataset, chartName, lblStrX, lblStrY, selectedElement, PDTO) {
     console.log("apareciendo en SetUpChart")
     const ctx = canvas[0].getContext('2d');
-
+    let indhor;
+    let requestindhor = new XMLHttpRequest();
+    requestindhor.open('GET', CONFIG.URL_INDHOR, false);
+    requestindhor.onreadystatechange = function() {
+        if (this.readyState === 4){
+            console.log("Pasando por indhor");
+            indhor = JSON.parse(this.responseText);
+            for (var i = 0; i < indhor.length; i++) {
+                indhor[i][0] = parseInt(indhor[i][0]);
+                indhor[i][1] = parseInt(indhor[i][1]);
+            }
+        }
+    }
+requestindhor.send();
+console.log("indhor: ",indhor);
     let config = {
         type: type, // Charts de tipo 'line' solo usan un color
         data: {
@@ -29,7 +43,18 @@ function setUpChart(canvas, xlabel, type, dataset, chartName, lblStrX, lblStrY, 
             },
             tooltips: {
                 mode: 'index',
-                intersect: false
+                intersect: false,
+              
+                callbacks: {
+                    beforeTitle: function(tooltipItem,data){
+                        return 'Bloque: '+ data.labels[tooltipItem[0].index]
+                      },
+                    label: function(tooltipItem, data) {
+                        var datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
+                        var label = datasetLabel + ': ' + tooltipItem.yLabel;
+                        return label;
+                    }
+                }
             },
             hover: {
                 mode: 'index',
@@ -42,24 +67,32 @@ function setUpChart(canvas, xlabel, type, dataset, chartName, lblStrX, lblStrY, 
             },
             scales: {
                 yAxes: [{
+                  ticks: {
+                    beginAtZero: true
+                  },
+                  scaleLabel: {
                     display: true,
-                    ticks: {
-                        beginAtZero:true
-                    },
-                    stacked: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: lblStrY
-                    }
+                    labelString: lblStrY
+                  }
                 }],
                 xAxes: [{
+                  scaleLabel: {
                     display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: lblStrX
-                    }
+                    labelString: lblStrX
+                  },
+                  ticks: {
+                    beginAtZero: true,
+                    callback: function(index) {
+                      for (var i = 0; i < indhor.length; i++) {
+                          if (index >= indhor[i][0] && index <= indhor[i][1]) {
+                              return indhor[i][2];
+                          }
+                      }
+                      return "";
+                  }
+                  }
                 }]
-            },
+              },
             responsive: true
         }
     };
@@ -202,7 +235,7 @@ function addCentralData(data, tipo, centralsData, yAxis) {
  * @returns {Function}
  */
 function createCallback(x, m, centralsData, yAxis) {
-    console.log("Pasando por modulo stacked-charts función createCallBack")
+    // console.log("Pasando por modulo stacked-charts función createCallBack")
     return function() {
         if (x.readyState === 4){
             addCentralData(JSON.parse(this.responseText), m, centralsData, yAxis);
