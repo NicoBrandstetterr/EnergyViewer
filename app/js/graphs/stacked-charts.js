@@ -37,25 +37,52 @@ console.log("indhor: ",indhor);
             datasets: dataset
         },
         options: {
-            title:{
-                display:true,
-                text: chartName
-            },
-            tooltips: {
-                mode: 'index',
-                intersect: false,
-              
-                callbacks: {
-                    beforeTitle: function(tooltipItem,data){
-                        return 'Bloque: '+ data.labels[tooltipItem[0].index]
-                      },
-                    label: function(tooltipItem, data) {
-                        var datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
-                        var label = datasetLabel + ': ' + tooltipItem.yLabel;
-                        return label;
+            plugins: {
+                title: {
+                  display: true,
+                  text: chartName
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+
+                  callbacks: {
+                    beforeTitle: function(tooltipItem){
+
+                      return 'Bloque: '+tooltipItem[0].label
+                    },
+                    title: function(tooltipItem){
+                      // console.log("title: ",typeof tooltipItem[0].label)
+                      for (var i = 0; i < indhor.length; i++) {
+                        if (tooltipItem[0].label >= indhor[i][0] && tooltipItem[0].label <= indhor[i][1]) {
+                            return indhor[i][2];
+                        }
                     }
+                      return "";
+                    },
+                      label: function(tooltipItem) {
+                          var datasetLabel = config.data.datasets[tooltipItem.datasetIndex].label || '';
+                          var label = datasetLabel + ': ' + tooltipItem.formattedValue;
+                          return label;
+                      }
+                  },
+                },
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    // drag: {
+                    //   enabled: true
+                    // },
+                    mode: 'xy',
+                  }
                 }
-            },
+
+              },
             hover: {
                 mode: 'index',
                 intersect: false
@@ -66,7 +93,7 @@ console.log("indhor: ",indhor);
                 }
             },
             scales: {
-                yAxes: [{
+                y: {
                   ticks: {
                     beginAtZero: true
                   },
@@ -74,8 +101,8 @@ console.log("indhor: ",indhor);
                     display: true,
                     labelString: lblStrY
                   }
-                }],
-                xAxes: [{
+                },
+                x: {
                   scaleLabel: {
                     display: true,
                     labelString: lblStrX
@@ -91,7 +118,7 @@ console.log("indhor: ",indhor);
                       return "";
                   }
                   }
-                }]
+                }
               },
             responsive: true
         }
@@ -183,7 +210,7 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
                 const dataset = {
                   label: title,
                   data: ylabel,
-                  borderWidth: 0,
+                  borderWidth: 2,
                   lineTension: 0,
                   backgroundColor: colorBkg,
                   borderColor: colorBkg

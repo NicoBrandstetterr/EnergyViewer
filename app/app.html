@@ -186,6 +186,7 @@
                 <div id="vis-column" class="col-md-10">
                     <!-- visjs -->
                     <div class="network electric" id="my-electric-network"></div>
+    
                     <div class="network hydric hidden" id="my-hydric-network"></div>
                     <div class="network geo hidden" id="my-geo-network"></div>
                     <ul id="canvas-selector">
@@ -466,7 +467,9 @@
 <!--         <script type="text/javascript" src="lib/jquery-latest.js"></script> -->
         <script type="text/javascript" src="lib/vis.js"></script>
         <script type="text/javascript" src="lib/chosen.jquery.min.js"></script>
-        <script type="text/javascript" src="lib/Chart.min.js"></script>
+        <script type="text/javascript" src="lib/hammer.js"></script>
+        <!-- <script type="module" src="lib/Chart.min.js" ></script> -->
+        <script type="text/javascript" src="lib/Chart.min.js" ></script>
         <script type="text/javascript" src="lib/FileSaver.min.js"></script>
         <script type="text/javascript" src="lib/Sortable.jquery.min.js"></script>
 
@@ -476,7 +479,11 @@
         <script type="text/javascript" src="js/gui/utils-app.js"></script>
         <!--<script type="text/javascript" src="config/utils.js"></script>-->
         <script type="text/javascript" src="js/timer.js"></script>
+        
         <!--<script type="text/javascript" src="js/loaders/filesystem.js"></script>-->
+        
+        <script type="text/javascript" src="lib/chartjs-plugin-zoom.min.js"></script>
+
 
         <!-- Cargamos los gráficos posibles dentro del grafo. -->
         <script type="text/javascript" src="js/graphs/action-chartjs.js"></script>

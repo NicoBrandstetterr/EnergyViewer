@@ -72,6 +72,8 @@ bReq.onreadystatechange = function () {
   if (this.readyState === 4) {
     
     console.log("pasando por bReq.onreadystatechange")
+    // console.log(process.versions.v8)
+    // console.log("version: ",process.versions.node)
     let t0 = performance.now();
     buses = JSON.parse(this.responseText);
 	  createLog('Archivo de barras leído', LOG_TYPE.SUCCESS)

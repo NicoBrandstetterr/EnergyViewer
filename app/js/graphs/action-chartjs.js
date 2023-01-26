@@ -1,7 +1,6 @@
 "use strict";
 
 // colores sacados de chart.
-
 /**
  *
  * Genera un gráfico Chartjs contra el tiempo, este gráfico se llama al cliquear la opción en una barra de la topología..
@@ -495,25 +494,52 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
             type: 'line',
             data: chartData,
             options: {
-              title: {
-                display: true,
-                text: txt
-              },
-              tooltips: {
-                mode: 'index',
-                intersect: false,
-              
-                callbacks: {
-                  beforeTitle: function(tooltipItem,data){
-                    return 'Bloque: '+data.labels[tooltipItem[0].index]
-                  },
-                    label: function(tooltipItem, data) {
-                        var datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
-                        var label = datasetLabel + ': ' + tooltipItem.yLabel;
-                        return label;
+              plugins: {
+                title: {
+                  display: true,
+                  text: txt
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+      
+                  callbacks: {
+                    beforeTitle: function(tooltipItem){
+      
+                      return 'Bloque: '+tooltipItem[0].label
+                    },
+                    title: function(tooltipItem){
+                      // console.log("title: ",typeof tooltipItem[0].label)
+                      for (var i = 0; i < indhor.length; i++) {
+                        if (tooltipItem[0].label >= indhor[i][0] && tooltipItem[0].label <= indhor[i][1]) {
+                            return indhor[i][2];
+                        }
                     }
+                      return "";
+                    },
+                      label: function(tooltipItem) {
+                          var datasetLabel = config.data.datasets[tooltipItem.datasetIndex].label || '';
+                          var label = datasetLabel + ': ' + tooltipItem.formattedValue;
+                          return label;
+                      }
+                  },
+                },
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    // drag: {
+                    //   enabled: true
+                    // },
+                    mode: 'xy',
+                  }
                 }
-            },
+      
+              },
               hover: {
                 mode: 'index',
                 intersect: false
@@ -524,7 +550,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                 }
               },
               scales: {
-                yAxes: [{
+                y: {
                   ticks: {
                     beginAtZero: true
                   },
@@ -532,8 +558,8 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                     display: true,
                     labelString: labelStrY
                   }
-                }],
-                xAxes: [{
+                },
+                x: {
                   scaleLabel: {
                     display: true,
                     labelString: labelStrX
@@ -549,7 +575,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                       return "";
                   }
                   }
-                }]
+                }
               },
               responsive: true
 
@@ -618,9 +644,9 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                 {
                     label: "Perc0",
                     data: perc0,
-                    borderColor: 'rgba(0, 0, 0, 1)',
-                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 0, 1)',
+                    borderColor: 'rgba(255, 192, 203, 1)',
+                    backgroundColor: 'rgba(255, 192, 203, 0.5)',
+                    pointBackgroundColor: 'rgba(255, 192, 203, 1)',
                     borderWidth: 2,
                     pointRadius: 0
                 },
@@ -667,25 +693,53 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
             type: 'line',
             data: chartData,
             options: {
-              title: {
-                display: true,
-                text: txt
-              },
-              tooltips: {
-                mode: 'index',
-                intersect: false,
-              
-                callbacks: {
-                  beforeTitle: function(tooltipItem,data){
-                    return 'Bloque: '+data.labels[tooltipItem[0].index]
-                  },
-                    label: function(tooltipItem, data) {
-                        var datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
-                        var label = datasetLabel + ': ' + tooltipItem.yLabel;
-                        return label;
+              plugins: {
+                title: {
+                  display: true,
+                  text: txt
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+
+                  callbacks: {
+                    beforeTitle: function(tooltipItem){
+
+                      return 'Bloque: '+tooltipItem[0].label
+                    },
+                    title: function(tooltipItem){
+                      // console.log("title: ",typeof tooltipItem[0].label)
+                      for (var i = 0; i < indhor.length; i++) {
+                        if (tooltipItem[0].label >= indhor[i][0] && tooltipItem[0].label <= indhor[i][1]) {
+                            return indhor[i][2];
+                        }
                     }
+                      return "";
+                    },
+                      label: function(tooltipItem) {
+                          var datasetLabel = config.data.datasets[tooltipItem.datasetIndex].label || '';
+                          var label = datasetLabel + ': ' + tooltipItem.formattedValue;
+                          return label;
+                      }
+                  },
+                },
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    // drag: {
+                    //   enabled: true
+                    // },
+                    mode: 'xy',
+                  }
                 }
-            },
+
+              },
+              
               hover: {
                 mode: 'index',
                 intersect: false
@@ -696,7 +750,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                 }
               },
               scales: {
-                yAxes: [{
+                y: {
                   ticks: {
                     beginAtZero: true
                   },
@@ -704,8 +758,8 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                     display: true,
                     labelString: labelStrY
                   }
-                }],
-                xAxes: [{
+                },
+                x: {
                   scaleLabel: {
                     display: true,
                     labelString: labelStrX
@@ -721,13 +775,12 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                       return "";
                   }
                   }
-                }]
+                }
               },
               responsive: true
 
             }
         };
-
         let myChart = new Chart(ctx, config);
         console.log("viendo mychart: ",myChart);
         // Se corrige la responsiveness de los gráficos
@@ -957,20 +1010,23 @@ function createChartMenu(row, elementID, PDTO) {
 /**
  * Esto es para la biblioteca Chartjs no dibuje fuera de los ejes.
  */
-Chart.plugins.register({
-  beforeDatasetsDraw: function(chartInstance) {
-    var ctx = chartInstance.chart.ctx;
-    var chartArea = chartInstance.chartArea;
-    ctx.save();
-    ctx.beginPath();
+console.log("Viendo version: ",Chart.version);
+// Chart.plugins.register({
+//   beforeDatasetsDraw: function(chartInstance) {
+//     var ctx = chartInstance.chart.ctx;
+//     var chartArea = chartInstance.chartArea;
+//     ctx.save();
+//     ctx.beginPath();
 
-    ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
-    ctx.clip();
-  },
-  afterDatasetsDraw: function(chartInstance) {
-    chartInstance.chart.ctx.restore();
-  },
-});
+//     ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+//     ctx.clip();
+//   },
+//   afterDatasetsDraw: function(chartInstance) {
+//     chartInstance.chart.ctx.restore();
+//   },
+// });
+
+
 
 /**
  * Genera gráfico apilado de generación del sistema.
