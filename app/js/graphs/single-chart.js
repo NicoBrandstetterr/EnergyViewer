@@ -13,7 +13,7 @@ function randomColor(seed = null) {
   rgb[(seed+1)%3] = Math.floor(Math.random()*255);
   rgb[(seed+2)%3] = 0;
 
-  return 'rgb(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ')';
+  return 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] +','+'1'+ ')';
 }
 
 /**

@@ -47,17 +47,17 @@ var CONFIG =
     "FAILURE_THRESHOLD"             : 400,
 	"NUMBER_OF_QUANTILES"			: 10,
 
-    "COLOR_SERIE"                   : "#2196F3", // Blue
-    "COLOR_EMBALSE"                 : "#3F51B5", // Indigo
-    "COLOR_PASADA"                  : "#03A9F4", // Light Blue
-    "COLOR_MINIHIDRO"               : "#00BCD4", // Cyan
-    "COLOR_SOLAR"                   : "#FFC107", // Amber (almost yellow)
-    "COLOR_EOLICA"                  : "#8BC34A", // Light Green
-    "COLOR_CARBON"                  : "#212121", // Grey 90%
-    "COLOR_DIESEL"                  : "#9E9E9E", // Grey 50%
-    "COLOR_GNL"                     : "#FF5722", // Deep Orange
-    "COLOR_BIOMASA"                 : "#795548", // Brown
-    "COLOR_COGENERACION"            : "#80DEEA"  // Cyan 20%
+    "COLOR_SERIE"                   : "rgba(33, 150, 243, 1)", // Blue
+    "COLOR_EMBALSE"                 : "rgba(63, 81, 181, 1)", // Indigo
+    "COLOR_PASADA"                  : "rgba(3, 169, 244, 1)", // Light Blue
+    "COLOR_MINIHIDRO"               : "rgba(0, 188, 212, 1)", // Cyan
+    "COLOR_SOLAR"                   : "rgba(255, 193, 7, 1)", // Amber (almost yellow)
+    "COLOR_EOLICA"                  : "rgba(139, 195, 74, 1)", // Light Green
+    "COLOR_CARBON"                  : "rgba(33, 33, 33, 1)", // Grey 90%
+    "COLOR_DIESEL"                  : "rgba(158, 158, 158, 1)", // Grey 50%
+    "COLOR_GNL"                     : "rgba(255, 87, 34, 1)", // Deep Orange
+    "COLOR_BIOMASA"                 : "rgba(121, 85, 72, 1)", // Brown
+    "COLOR_COGENERACION"            : "rgba(128, 222, 234, 1)"  // Cyan 20%
   };
 
 //Le agrego lo que viene en base_cfg a CONFIG

@@ -170,10 +170,10 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
                 // Colores respecto a CONFIG
                 let colorBkg;
                 switch(title) {
-                    case "Serie":
+                    case "hidraulica_serie":
                         colorBkg = CONFIG.COLOR_SERIE;
                         break;
-                    case "Embalse":
+                    case "hidraulica_embalse":
                         colorBkg = CONFIG.COLOR_EMBALSE;
                         break;
                     case "Pasada":
@@ -182,22 +182,22 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
                     case "Minihidro":
                         colorBkg = CONFIG.COLOR_MINIHIDRO;
                         break;
-                    case "Solar":
+                    case "solar_fv":
                         colorBkg = CONFIG.COLOR_SOLAR;
                         break;
-                    case "Eolica":
+                    case "eolica":
                         colorBkg = CONFIG.COLOR_EOLICA;
                         break;
-                    case "Carbon":
+                    case "carbon":
                         colorBkg = CONFIG.COLOR_CARBON;
                         break;
-                    case "Diesel":
+                    case "diesel":
                         colorBkg = CONFIG.COLOR_DIESEL;
                         break;
                     case "GNL":
                         colorBkg = CONFIG.COLOR_GNL;
                         break;
-                    case "Biomasa":
+                    case "biomasa":
                         colorBkg = CONFIG.COLOR_BIOMASA;
                         break;
                     case "Cogeneracion":
@@ -210,10 +210,11 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
                 const dataset = {
                   label: title,
                   data: ylabel,
-                  borderWidth: 2,
+                  borderWidth: 1,
                   lineTension: 0,
-                  backgroundColor: colorBkg,
-                  borderColor: colorBkg
+                  backgroundColor: colorBkg.replace(/1(?=[^,\d])/, '0.3'),
+                  borderColor: colorBkg,
+                  fill: true
                 };
                 color += 1;
                 setDeDatos.push(dataset);

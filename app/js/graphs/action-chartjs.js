@@ -433,61 +433,57 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
           let chartData = {
             labels: time,
             datasets: [
-                {
-                    label: "Perc0",
-                    data: perc0,
-                    borderColor: 'rgba(0, 0, 0, 1)',
-                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc20",
-                    data: perc20,
-                    borderColor: 'rgba(255, 0, 0, 1)',
-                    backgroundColor: 'rgba(255, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(255, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc80",
-                    data: perc80,
-                    borderColor: 'rgba(0, 255, 0, 1)',
-                    backgroundColor: 'rgba(0, 255, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 255, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc100",
-                    data: perc100,
-                    borderColor: 'rgba(0, 0, 255, 1)',
-                    backgroundColor: 'rgba(0, 0, 255, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 255, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Min",
-                    data: Min,
-                    borderColor: 'rgba(255, 255, 0, 1)',
-                    backgroundColor: 'rgba(255, 255, 0, 0)',
-                    pointBackgroundColor: 'rgba(255, 255, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                  label: "Max",
-                  data: Max,
-                  borderColor: newColor,
-                  backgroundColor: 'rgba(255, 255, 0, 0)',
-                  pointBackgroundColor: newColor,
-                  borderWidth: 2,
-                  pointRadius: 0
+              {
+                  label: "Perc0",
+                  data: perc0,
+                  borderColor: 'rgba(33, 33, 33, 1)',
+                  backgroundColor: 'rgba(33, 33, 33, 0.3)',
+                  pointBackgroundColor: 'rgba(33, 33, 33, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc20",
+                  data: perc20,
+                  borderColor: 'rgba(255, 0, 0, 1)',
+                  backgroundColor: 'rgba(255, 0, 0, 0.3)',
+                  pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc80",
+                  data: perc80,
+                  borderColor: 'rgba(0, 255, 0, 1)',
+                  backgroundColor: 'rgba(0, 255, 0, 0.3)',
+                  pointBackgroundColor: 'rgba(0, 255, 0, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc100",
+                  data: perc100,
+                  borderColor: 'rgba(0, 0, 255, 1)',
+                  backgroundColor: 'rgba(0, 0, 255, 0.3)',
+                  pointBackgroundColor: 'rgba(0, 0, 255, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Promedio",
+                  data: promedio,
+                  borderColor: 'rgba(255, 193, 7, 1)',
+                  backgroundColor: 'rgba(255, 193, 7, 0.3)',
+                  pointBackgroundColor: 'rgba(255, 193, 7, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
               }
-            ]
+          ]
           };
           
           let config = {
@@ -641,52 +637,57 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
           let chartData = {
             labels: time,
             datasets: [
-                {
-                    label: "Perc0",
-                    data: perc0,
-                    borderColor: 'rgba(255, 192, 203, 1)',
-                    backgroundColor: 'rgba(255, 192, 203, 0.5)',
-                    pointBackgroundColor: 'rgba(255, 192, 203, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc20",
-                    data: perc20,
-                    borderColor: 'rgba(255, 0, 0, 1)',
-                    backgroundColor: 'rgba(255, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(255, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc80",
-                    data: perc80,
-                    borderColor: 'rgba(0, 255, 0, 1)',
-                    backgroundColor: 'rgba(0, 255, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 255, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc100",
-                    data: perc100,
-                    borderColor: 'rgba(0, 0, 255, 1)',
-                    backgroundColor: 'rgba(0, 0, 255, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 255, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Promedio",
-                    data: promedio,
-                    borderColor: 'rgba(255, 255, 0, 1)',
-                    backgroundColor: 'rgba(255, 255, 0, 0)',
-                    pointBackgroundColor: 'rgba(255, 255, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                }
-            ]
+              {
+                  label: "Perc0",
+                  data: perc0,
+                  borderColor: 'rgba(33, 33, 33, 1)',
+                  backgroundColor: 'rgba(33, 33, 33, 0.3)',
+                  pointBackgroundColor: 'rgba(33, 33, 33, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc20",
+                  data: perc20,
+                  borderColor: 'rgba(255, 0, 0, 1)',
+                  backgroundColor: 'rgba(255, 0, 0, 0.3)',
+                  pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc80",
+                  data: perc80,
+                  borderColor: 'rgba(0, 255, 0, 1)',
+                  backgroundColor: 'rgba(0, 255, 0, 0.3)',
+                  pointBackgroundColor: 'rgba(0, 255, 0, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc100",
+                  data: perc100,
+                  borderColor: 'rgba(0, 0, 255, 1)',
+                  backgroundColor: 'rgba(0, 0, 255, 0.3)',
+                  pointBackgroundColor: 'rgba(0, 0, 255, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Promedio",
+                  data: promedio,
+                  borderColor: 'rgba(255, 193, 7, 1)',
+                  backgroundColor: 'rgba(255, 193, 7, 0.3)',
+                  pointBackgroundColor: 'rgba(255, 193, 7, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              }
+          ]
           };
           
           let config = {
