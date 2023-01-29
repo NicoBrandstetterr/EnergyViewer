@@ -474,15 +474,25 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   fill: true
               },
               {
-                  label: "Promedio",
-                  data: promedio,
-                  borderColor: 'rgba(255, 193, 7, 1)',
-                  backgroundColor: 'rgba(255, 193, 7, 0.3)',
-                  pointBackgroundColor: 'rgba(255, 193, 7, 1)',
-                  borderWidth: 1,
-                  pointRadius: 0,
-                  fill: true
-              }
+                label: "Min",
+                data: Min,
+                borderColor: 'rgba(255, 0, 0, 1)',
+              backgroundColor: 'rgba(255, 0, 0, 0)',
+              pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                borderWidth: 1,
+                pointRadius: 0,
+           
+            },
+            {
+              label: "Max",
+              data: Max,
+              borderColor: 'rgba(255, 0, 0, 1)',
+              backgroundColor: 'rgba(255, 0, 0, 0)',
+              pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+              borderWidth: 1,
+              pointRadius: 0,
+        
+          }
           ]
           };
           
