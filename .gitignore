@@ -53,4 +53,4 @@ fabric.properties
 app/resources/browser/Data
 data/
 PLP20230104
-app\resources\browser\GoogleChromePortable
+app/resources/browser/GoogleChromePortable
