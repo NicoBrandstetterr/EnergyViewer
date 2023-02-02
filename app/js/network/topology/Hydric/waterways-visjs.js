@@ -5,6 +5,8 @@
  */
 
 function parseWaterways(waterways, hydricTopology){
+  console.log("pasando por parseWaterways");
+  console.log("hydricTopology: ", hydricTopology)
   var graph = [];
   
   var currentSet = [];
@@ -42,7 +44,7 @@ function parseWaterways(waterways, hydricTopology){
 				return '#00AAAA';
 		}
   }
-
+  console.log("graph: ",graph)
   for (var i = 0; i < waterways.length; i++) {
 
     // Variable para dejar en el label si esta activo en forma intuitiva.
@@ -198,7 +200,8 @@ function parseWaterways(waterways, hydricTopology){
 
 
 function addWaterwaysToNetwork(waterways){
-
+  console.log("pasando por addWaterwaysToNetwork");
+  console.log("waterways: ",waterways);
   // Agregamos las líneas a la red (Network).
   edgesHArray = edgesHArray.concat(waterways);
 }

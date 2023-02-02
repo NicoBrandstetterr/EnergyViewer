@@ -332,7 +332,10 @@ console.log("indhor: ",indhor);
     };
   
     // Se genera el gráfico ChartJS.
+    console.log(ctx);
+    console.log(config);
     let myChart = new Chart(ctx, config);
+    console.log(myChart);
     
     // Se corrige la responsiveness de los gráficos
     $(window).resize(function() {

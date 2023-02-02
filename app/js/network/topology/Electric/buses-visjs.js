@@ -187,10 +187,10 @@ function parseBuses(buses, electricTopology, type) {
 	let T9 = performance.now()
   List[8].push(T9-T8);
   }
-  for (let i = 0; i < List.length; i++) {
-    let suma = List[i].reduce((a,b) => a+b);
-    console.log(`La suma de la lista ${i+1} es: ${suma}`);
-  }
+  // for (let i = 0; i < List.length; i++) {
+  //   let suma = List[i].reduce((a,b) => a+b);
+  //   console.log(`La suma de la lista ${i+1} es: ${suma}`);
+  // }
 
   let t1 = performance.now();
   console.log("parseBus despues de for linea 66 tardó " + (t1-t0) + " milisegundos.")

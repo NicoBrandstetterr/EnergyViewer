@@ -48,15 +48,20 @@ function dijkstra(graph,src){
 var junctionIdToIndice = {};
 
 function loadHydricTopology(junctions, waterways, reservoirs){
-
+  console.log("pasando por loadHydricTopology");
   // Parseamos las variables recibidas.
+  console.log("hydricTopology: ", hydricTopology);
   parseJunctions(junctions, hydricTopology);
+  console.log("hydricTopology: ", hydricTopology);
   parseReservoirs(reservoirs, hydricTopology);
+  console.log("waterways: ", waterways);
+  console.log("hydricTopology: ",hydricTopology);
   parseWaterways(waterways, hydricTopology);
+  console.log("hydricTopology: ", hydricTopology);
 }
 
 function parseHydricTopologyToNetwork(){
-
+  console.log("pasando por parseHydricTopologyToNetwork");
  // nodesHArray = [];
  // edgesHArray = [];
 

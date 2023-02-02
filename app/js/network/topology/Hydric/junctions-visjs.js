@@ -5,7 +5,7 @@
  */
 
 function parseJunctions(junctions, hydricTopology){
-
+  console.log("pasando por parseJunctions");
   /*
    * Iterar sobre las uniones y parsearlas como nodos.
    */
@@ -20,7 +20,7 @@ function parseJunctions(junctions, hydricTopology){
     // Guardamos el id maximo para no topar entre id de generador y id de barra
     maxid = Math.max(junctions[i].id, maxid);
 
-    // Creamos el nodo de la union con sus caraceristicas correspondientes.
+    // Creamos el nodo de la union con sus caracteristicas correspondientes.
     var union = {
       id: junctions[i].id,
       junctionId: junctions[i].id,
@@ -53,6 +53,7 @@ function parseJunctions(junctions, hydricTopology){
 
 
 function addJunctionsToNetwork(junctions){
+  console.log("pasando por addJunctionsToNetwork");
 
   // Agregamos las barras a la red (Network).
   nodesHArray = nodesHArray.concat(junctions);
