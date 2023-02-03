@@ -14,6 +14,7 @@ var busInfo;
 gReq.onreadystatechange = function () {
   
   if (this.readyState === 4) {
+    console.log("pasando por gReq.onreadystatechange")
     let t0 = performance.now();
     generators = JSON.parse(this.responseText);
 	  createLog('Archivo de generadores leído', LOG_TYPE.SUCCESS)
@@ -23,13 +24,13 @@ gReq.onreadystatechange = function () {
     // console.log("generators = JSON.parse(this.responseText); tardó " + (t1 - t0) + " milisegundos.")
     loadElectricTopology(buses, lines, generators);
     let t2 = performance.now();
-    // console.log("loadElectricTopology tardó " + (t2 - t1) + " milisegundos.")
+    console.log("loadElectricTopology tardó " + (t2 - t1) + " milisegundos.")
     parseElectricTopologyToNetwork();
     let t3 = performance.now();
-    // console.log("parseElectricTopologyToNetwork tardó " + (t3 - t2) + " milisegundos.")
+    console.log("parseElectricTopologyToNetwork tardó " + (t3 - t2) + " milisegundos.")
     addDataToMapNetwork();
     let t4 = performance.now();
-    // console.log("addDataToMapNetwork tardó " + (t4 - t3) + " milisegundos.")
+    console.log("addDataToMapNetwork tardó " + (t4 - t3) + " milisegundos.")
     console.log("Se viene creacion red electrica")
     var result = generateNetwork(electricContainer, nodesArray, edgesArray, TOPOLOGY_TYPES.ELECTRIC);
 	  createLog('Red eléctrica generada correctamente!', LOG_TYPE.SUCCESS)
@@ -63,6 +64,7 @@ lReq.onreadystatechange = function () {
     lines = JSON.parse(this.responseText);
     if(!CONFIG.RESULTS_DISABLED) loadLinesFiles();
     createLog('Archivo de líneas leído', LOG_TYPE.SUCCESS);
+    console.log("Tiempo de carga lines topology:" + (performance.now()-t0) + " milisegundos.");
     gReq.open("GET", CONFIG.URL_CENTRALS, false);
     gReq.send();
     let t1 = performance.now();
@@ -73,8 +75,10 @@ lReq.onreadystatechange = function () {
 bReq.onreadystatechange = function () {
   
   if (this.readyState === 4) {
-    
+    console.log("hidrotimes -1: ",hydrologyTimes)
     console.log("pasando por bReq.onreadystatechange")
+    // console.log(process.versions.v8)
+    // console.log("version: ",process.versions.node)
     let t0 = performance.now();
     buses = JSON.parse(this.responseText);
 	  createLog('Archivo de barras leído', LOG_TYPE.SUCCESS)

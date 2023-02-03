@@ -1,7 +1,6 @@
 "use strict";
 
 // colores sacados de chart.
-
 /**
  *
  * Genera un gráfico Chartjs contra el tiempo, este gráfico se llama al cliquear la opción en una barra de la topología..
@@ -14,16 +13,16 @@
  */
 function generateBusChart(canvas, selectedElement, type, PDTO, nodeName) {  // PDTO === Plotable DataType Object Esta función recibe datos y genera un grafico con ellos en el canvas
   console.log("pasando por generateBusChart")
-  console.log("presentando canvas: ", canvas)
+  // console.log("presentando canvas: ", canvas)
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
 	let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
-  console.log("containerID: ",containerID)
+  // console.log("containerID: ",containerID)
 	canvas.attr("id","canvas_" + containerID);
   let row = canvas.parent().parent();
-  console.log("row: ",row)
+  // console.log("row: ",row)
   canvas.attr("id", "row_" + containerID);
-  console.log("presentando canvas: ", canvas)
+  // console.log("presentando canvas: ", canvas)
   let title = "H1"; // Título en negritas del gráfico.
   let newColor = randomColor();
   let bkgCol= newColor; // Color de la línea,
@@ -216,7 +215,7 @@ function generateGenerationChart(canvas, selectedElement, type, PDTO, centralNam
  * @param hydroNum Numero de la hidrologia desde donde se agregaran datos
  */
 function generatePiledGraph(canvas, selectedElement, type, PDTO, centrals, busName) {
-  console.log("pasando por gerenatePiledGraph")
+  console.log("pasando por generatePiledGraph")
   let xAxis = PDTO.idX;
   let yAxis = PDTO.idY;
   var containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
@@ -260,64 +259,29 @@ function generatePiledGraph(canvas, selectedElement, type, PDTO, centrals, busNa
  */
 function generateSystemPiledGraph(canvas, type, PDTO, hydroNum) {
   console.log("pasando por generateSystemPiledGraph en modulo action-chartjs")
-  let xAxis = PDTO.idX;
-  let yAxis = PDTO.idY;
-  let containerID = 'chart' + '-Sistema' + '-' + xAxis + '-' + yAxis;
-
-  canvas.id = "canvas_" + containerID;
-  let row = canvas.parent().parent();
-  row.id = "row_" + containerID;
-
-  let  lblStrX="Tiempo [bloques]";
-  let  lblStrY="Generación [MW]";
-  let centralsData = {};
-
-  let setDeDatos = [];
-  let xlabel = [];
-
-  let centrals = currentNodes.get({
-    filter: function (item) {
-      return (item.category === 'central');
+  let jsonUrl=CONFIG.PILED_GENERATION_GRAPH_FOLDER+'generation_system_'+hydroNum.toString()+'.json';
+  console.log("jsonURL: ",jsonUrl)
+  let request = new XMLHttpRequest();
+  request.open('GET', jsonUrl, false);
+  request.onreadystatechange = function(){
+    if (this.readyState === 4){
+      let xAxis = PDTO.idX;
+      let yAxis = PDTO.idY;
+      let containerID = 'chart' + '-Sistema' + '-' + xAxis + '-' + yAxis;
+      canvas.id = "canvas_" + containerID;
+      let row = canvas.parent().parent();
+      row.id = "row_" + containerID;
+      let  lblStrX="Tiempo [bloques]";
+      let  lblStrY="Generación [MW]";
+      let centralsData = JSON.parse(this.responseText);
+      let setDeDatos = [];
+      let xlabel = [];
+      addDataSets(centralsData, xAxis, yAxis, setDeDatos, xlabel);
+      setUpChart(canvas, xlabel, type, setDeDatos, 'Generación del sistema', lblStrX, lblStrY, 'Sistema', PDTO);
     }
-  });
-
-  /* Se cargan los datos de la barra seleccionada. */
-  let callBack = function(m, id) {
-    // console.log("pasando por callBack de generateSystemPiledGraph")
-    return function (x) {
-      return function() {
-        if (x.readyState === 4){
-
-          const cData = JSON.parse(x.responseText);
-
-          if(!(id in hydrologyTimes[chosenHydrology]['centrals'])) {
-            hydrologyTimes[chosenHydrology]['centrals'][id] = cData;
-          }
-
-          addCentralData(cData, m, centralsData, yAxis);
-        }
-      };
-    }
-  };
-
-  /* Si los datos estan cargados se ejecuta este método. */
-  let preLoad = function (m) {
-    // console.log("pasando por preload de generateSystemPiledGraph")
-    return function (data) {
-      addCentralData(data, m, centralsData, yAxis);
-    }
-  };
-  console.log("Cargando datos y si es que existen crando grafico usando funciones addCentralData y loadTypeFile")
-  for (let i = 0; i < centrals.length; i++) {
-    /* se cargan los datos y si existen se crea el gráfico. */
-    // console.log("Mostrando datos centrals[i]: ", centrals[i])
-    loadTypeFile(centrals[i].centralId, preLoad(centrals[i].tipo), callBack(centrals[i].tipo, centrals[i].centralId), hydroNum, 'centrals');
   }
+  request.send();
 
-  //addDataSets(centralsData);
-  console.log("Se presenta, previo a addDataSets, los valores yAxis: ", yAxis)
-  addDataSets(centralsData, xAxis, yAxis, setDeDatos, xlabel);
-  setUpChart(canvas, xlabel, type, setDeDatos, 'Generación del sistema', lblStrX, lblStrY, 'Sistema', PDTO);
 }
 
 
@@ -408,22 +372,35 @@ function generateFlowBusChart(canvas, selectedElement, type, PDTO, edges, busNam
 
 function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
   console.log("pasando por function percentilll")
+  let indhor;
+  let requestindhor = new XMLHttpRequest();
+  requestindhor.open('GET', CONFIG.URL_INDHOR, false);
+  requestindhor.onreadystatechange = function() {
+    if (this.readyState === 4){
+      console.log("Pasando por indhor");
+      indhor = JSON.parse(this.responseText);
+      for (var i = 0; i < indhor.length; i++) {
+        indhor[i][0] = parseInt(indhor[i][0]);
+        indhor[i][1] = parseInt(indhor[i][1]);
+      }
+    }
+  }
+  requestindhor.send();
+  console.log("indhor: ",indhor);
   if (elementObject.category === "bus-to-bus"){
     console.log("Percentil Lineas");
-    console.log("Mostrando objeto",elementObject);
-    console.log("Mostrando ID y numberID: ",elementObject.lineNumber,selectedElement);
-    let jsonUrl=CONFIG.PERCENTIL_FLOW_LINE_FOLDER+'line_'+elementObject.lineNumber.toString()+'.json';
-    console.log("jsonURL: ",jsonUrl)
+    // console.log("Mostrando objeto",elementObject);
+    // console.log("Mostrando ID y numberID: ",elementObject.lineNumber,selectedElement);
+    let jsonUrl = CONFIG.PERCENTIL_FLOW_LINE_FOLDER+'line_'+elementObject.lineNumber.toString()+'.json';
     let request = new XMLHttpRequest();
     let xAxis = PDTO.idX;
     let yAxis = PDTO.idY;
     request.open('GET', jsonUrl, false);
     request.onreadystatechange = function() {
         if (this.readyState === 4) {
-          console.log("Se entro al readystate===4")
+          // console.log("Se entro al readystate===4")
           let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
           canvas.attr("id","canvas_" + containerID);
-          
           let title = "Percentil_FL"; // Título en negritas del gráfico.
           let newColor = randomColor();
           let bkgCol= newColor; // Color de la línea,
@@ -431,10 +408,10 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
           let labelStrX= PDTO.labelX + " " + PDTO.unitX; // Etiqueta del eje x
           let labelStrY= PDTO.labelY + " " + PDTO.unitY; // Etiqueta del eje y
           
-          
+      
           let perc_data = JSON.parse(this.responseText);
-          console.log("perc_Data: ",perc_data)
-          console.log("perc_Data type: ",typeof perc_data)
+          // console.log("perc_Data: ",perc_data)
+          // console.log("perc_Data type: ",typeof perc_data)
           let txt = PDTO.title + " en " + perc_data[0].LinName; // Título del dataset correspondiente.
   
           // Inicia simil con setUpSingleDATA
@@ -456,74 +433,118 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
           let chartData = {
             labels: time,
             datasets: [
-                {
-                    label: "Perc0",
-                    data: perc0,
-                    borderColor: 'rgba(0, 0, 0, 1)',
-                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc20",
-                    data: perc20,
-                    borderColor: 'rgba(255, 0, 0, 1)',
-                    backgroundColor: 'rgba(255, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(255, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc80",
-                    data: perc80,
-                    borderColor: 'rgba(0, 255, 0, 1)',
-                    backgroundColor: 'rgba(0, 255, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 255, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc100",
-                    data: perc100,
-                    borderColor: 'rgba(0, 0, 255, 1)',
-                    backgroundColor: 'rgba(0, 0, 255, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 255, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Min",
-                    data: Min,
-                    borderColor: 'rgba(255, 255, 0, 1)',
-                    backgroundColor: 'rgba(255, 255, 0, 0)',
-                    pointBackgroundColor: 'rgba(255, 255, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                  label: "Max",
-                  data: Max,
-                  borderColor: newColor,
-                  backgroundColor: 'rgba(255, 255, 0, 0)',
-                  pointBackgroundColor: newColor,
-                  borderWidth: 2,
-                  pointRadius: 0
-              }
-            ]
+              {
+                  label: "Perc0",
+                  data: perc0,
+                  borderColor: 'rgba(33, 33, 33, 1)',
+                  backgroundColor: 'rgba(33, 33, 33, 0.3)',
+                  pointBackgroundColor: 'rgba(33, 33, 33, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc20",
+                  data: perc20,
+                  borderColor: 'rgba(255, 0, 0, 1)',
+                  backgroundColor: 'rgba(255, 0, 0, 0.3)',
+                  pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc80",
+                  data: perc80,
+                  borderColor: 'rgba(0, 255, 0, 1)',
+                  backgroundColor: 'rgba(0, 255, 0, 0.3)',
+                  pointBackgroundColor: 'rgba(0, 255, 0, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc100",
+                  data: perc100,
+                  borderColor: 'rgba(0, 0, 255, 1)',
+                  backgroundColor: 'rgba(0, 0, 255, 0.3)',
+                  pointBackgroundColor: 'rgba(0, 0, 255, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                label: "Min",
+                data: Min,
+                borderColor: 'rgba(255, 0, 0, 1)',
+              backgroundColor: 'rgba(255, 0, 0, 0)',
+              pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                borderWidth: 1,
+                pointRadius: 0,
+           
+            },
+            {
+              label: "Max",
+              data: Max,
+              borderColor: 'rgba(255, 0, 0, 1)',
+              backgroundColor: 'rgba(255, 0, 0, 0)',
+              pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+              borderWidth: 1,
+              pointRadius: 0,
+        
+          }
+          ]
           };
           
           let config = {
             type: 'line',
             data: chartData,
             options: {
-              title: {
-                display: true,
-                text: txt
-              },
-              tooltips: {
-                mode: 'index',
-                intersect: false
+              plugins: {
+                title: {
+                  display: true,
+                  text: txt
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+      
+                  callbacks: {
+                    beforeTitle: function(tooltipItem){
+      
+                      return 'Bloque: '+tooltipItem[0].label
+                    },
+                    title: function(tooltipItem){
+                      // console.log("title: ",typeof tooltipItem[0].label)
+                      for (var i = 0; i < indhor.length; i++) {
+                        if (tooltipItem[0].label >= indhor[i][0] && tooltipItem[0].label <= indhor[i][1]) {
+                            return indhor[i][2];
+                        }
+                    }
+                      return "";
+                    },
+                      label: function(tooltipItem) {
+                          var datasetLabel = config.data.datasets[tooltipItem.datasetIndex].label || '';
+                          var label = datasetLabel + ': ' + tooltipItem.formattedValue;
+                          return label;
+                      }
+                  },
+                },
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    // drag: {
+                    //   enabled: true
+                    // },
+                    mode: 'xy',
+                  }
+                }
+      
               },
               hover: {
                 mode: 'index',
@@ -535,7 +556,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                 }
               },
               scales: {
-                yAxes: [{
+                y: {
                   ticks: {
                     beginAtZero: true
                   },
@@ -543,16 +564,24 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                     display: true,
                     labelString: labelStrY
                   }
-                }],
-                xAxes: [{
+                },
+                x: {
                   scaleLabel: {
                     display: true,
                     labelString: labelStrX
                   },
                   ticks: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    callback: function(index) {
+                      for (var i = 0; i < indhor.length; i++) {
+                          if (index >= indhor[i][0] && index <= indhor[i][1]) {
+                              return indhor[i][2];
+                          }
+                      }
+                      return "";
                   }
-                }]
+                  }
+                }
               },
               responsive: true
 
@@ -575,8 +604,8 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
     }
   else if (elementObject.category === "bus"){
     console.log("Percentil bus")
-    console.log("Mostrando objeto",elementObject);
-    console.log("Mostrando ID y numberID: ",elementObject.lineNumber,selectedElement);
+    // console.log("Mostrando objeto",elementObject);
+    // console.log("Mostrando ID y numberID: ",elementObject.lineNumber,selectedElement);
     let jsonUrl=CONFIG.PERCENTIL_MARGINAL_COST_FOLDER+'bus_'+selectedElement.toString()+'.json';
     console.log("jsonURL: ",jsonUrl)
     let request = new XMLHttpRequest();
@@ -585,11 +614,9 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
     request.open('GET', jsonUrl, false);
     request.onreadystatechange = function() {
         if (this.readyState === 4) {
-          console.log("Se entro al readystate===4")
+          // console.log("Se entro al readystate===4")
           let containerID = 'chart' + selectedElement + '-' + xAxis + '-' + yAxis;
           canvas.attr("id","canvas_" + containerID);
-
-          console.log("presentando canvas mod: ", canvas)
           
           let title = "Percentil_MC"; // Título en negritas del gráfico.
           let newColor = randomColor();
@@ -598,10 +625,9 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
           let labelStrX= PDTO.labelX + " " + PDTO.unitX; // Etiqueta del eje x
           let labelStrY= PDTO.labelY + " " + PDTO.unitY; // Etiqueta del eje y
           let txt = PDTO.title + " en la barra " + elementObject.nodeName; // Título del dataset correspondiente.
-          console.log("antes del parse")
           let perc_data = JSON.parse(this.responseText);
-          console.log("perc_Data: ",perc_data)
-          console.log("perc_Data type: ",typeof perc_data)
+          // console.log("perc_Data: ",perc_data)
+          // console.log("perc_Data type: ",typeof perc_data)
   
           // Inicia simil con setUpSingleDATA
           let perc0 = [], perc20 = [], perc80 = [], perc100 = [], promedio = []
@@ -621,66 +647,110 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
           let chartData = {
             labels: time,
             datasets: [
-                {
-                    label: "Perc0",
-                    data: perc0,
-                    borderColor: 'rgba(0, 0, 0, 1)',
-                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc20",
-                    data: perc20,
-                    borderColor: 'rgba(255, 0, 0, 1)',
-                    backgroundColor: 'rgba(255, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(255, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc80",
-                    data: perc80,
-                    borderColor: 'rgba(0, 255, 0, 1)',
-                    backgroundColor: 'rgba(0, 255, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 255, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Perc100",
-                    data: perc100,
-                    borderColor: 'rgba(0, 0, 255, 1)',
-                    backgroundColor: 'rgba(0, 0, 255, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 255, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                },
-                {
-                    label: "Promedio",
-                    data: promedio,
-                    borderColor: 'rgba(255, 255, 0, 1)',
-                    backgroundColor: 'rgba(255, 255, 0, 0)',
-                    pointBackgroundColor: 'rgba(255, 255, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0
-                }
-            ]
+              {
+                  label: "Perc0",
+                  data: perc0,
+                  borderColor: 'rgba(33, 33, 33, 1)',
+                  backgroundColor: 'rgba(33, 33, 33, 0.3)',
+                  pointBackgroundColor: 'rgba(33, 33, 33, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc20",
+                  data: perc20,
+                  borderColor: 'rgba(255, 0, 0, 1)',
+                  backgroundColor: 'rgba(255, 0, 0, 0.3)',
+                  pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc80",
+                  data: perc80,
+                  borderColor: 'rgba(0, 255, 0, 1)',
+                  backgroundColor: 'rgba(0, 255, 0, 0.3)',
+                  pointBackgroundColor: 'rgba(0, 255, 0, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Perc100",
+                  data: perc100,
+                  borderColor: 'rgba(0, 0, 255, 1)',
+                  backgroundColor: 'rgba(0, 0, 255, 0.3)',
+                  pointBackgroundColor: 'rgba(0, 0, 255, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              },
+              {
+                  label: "Promedio",
+                  data: promedio,
+                  borderColor: 'rgba(255, 193, 7, 1)',
+                  backgroundColor: 'rgba(255, 193, 7, 0.3)',
+                  pointBackgroundColor: 'rgba(255, 193, 7, 1)',
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: true
+              }
+          ]
           };
           
           let config = {
             type: 'line',
             data: chartData,
             options: {
-              title: {
-                display: true,
-                text: txt
+              plugins: {
+                title: {
+                  display: true,
+                  text: txt
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+
+                  callbacks: {
+                    beforeTitle: function(tooltipItem){
+
+                      return 'Bloque: '+tooltipItem[0].label
+                    },
+                    title: function(tooltipItem){
+                      // console.log("title: ",typeof tooltipItem[0].label)
+                      for (var i = 0; i < indhor.length; i++) {
+                        if (tooltipItem[0].label >= indhor[i][0] && tooltipItem[0].label <= indhor[i][1]) {
+                            return indhor[i][2];
+                        }
+                    }
+                      return "";
+                    },
+                      label: function(tooltipItem) {
+                          var datasetLabel = config.data.datasets[tooltipItem.datasetIndex].label || '';
+                          var label = datasetLabel + ': ' + tooltipItem.formattedValue;
+                          return label;
+                      }
+                  },
+                },
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    // drag: {
+                    //   enabled: true
+                    // },
+                    mode: 'xy',
+                  }
+                }
+
               },
-              tooltips: {
-                mode: 'index',
-                intersect: false
-              },
+              
               hover: {
                 mode: 'index',
                 intersect: false
@@ -691,7 +761,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                 }
               },
               scales: {
-                yAxes: [{
+                y: {
                   ticks: {
                     beginAtZero: true
                   },
@@ -699,22 +769,29 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                     display: true,
                     labelString: labelStrY
                   }
-                }],
-                xAxes: [{
+                },
+                x: {
                   scaleLabel: {
                     display: true,
                     labelString: labelStrX
                   },
                   ticks: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    callback: function(index) {
+                      for (var i = 0; i < indhor.length; i++) {
+                          if (index >= indhor[i][0] && index <= indhor[i][1]) {
+                              return indhor[i][2];
+                          }
+                      }
+                      return "";
                   }
-                }]
+                  }
+                }
               },
               responsive: true
 
             }
         };
-
         let myChart = new Chart(ctx, config);
         console.log("viendo mychart: ",myChart);
         // Se corrige la responsiveness de los gráficos
@@ -944,20 +1021,23 @@ function createChartMenu(row, elementID, PDTO) {
 /**
  * Esto es para la biblioteca Chartjs no dibuje fuera de los ejes.
  */
-Chart.plugins.register({
-  beforeDatasetsDraw: function(chartInstance) {
-    var ctx = chartInstance.chart.ctx;
-    var chartArea = chartInstance.chartArea;
-    ctx.save();
-    ctx.beginPath();
+console.log("Viendo version: ",Chart.version);
+// Chart.plugins.register({
+//   beforeDatasetsDraw: function(chartInstance) {
+//     var ctx = chartInstance.chart.ctx;
+//     var chartArea = chartInstance.chartArea;
+//     ctx.save();
+//     ctx.beginPath();
 
-    ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
-    ctx.clip();
-  },
-  afterDatasetsDraw: function(chartInstance) {
-    chartInstance.chart.ctx.restore();
-  },
-});
+//     ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+//     ctx.clip();
+//   },
+//   afterDatasetsDraw: function(chartInstance) {
+//     chartInstance.chart.ctx.restore();
+//   },
+// });
+
+
 
 /**
  * Genera gráfico apilado de generación del sistema.

@@ -15,7 +15,21 @@
 function setUpChart(canvas, xlabel, type, dataset, chartName, lblStrX, lblStrY, selectedElement, PDTO) {
     console.log("apareciendo en SetUpChart")
     const ctx = canvas[0].getContext('2d');
-
+    let indhor;
+    let requestindhor = new XMLHttpRequest();
+    requestindhor.open('GET', CONFIG.URL_INDHOR, false);
+    requestindhor.onreadystatechange = function() {
+        if (this.readyState === 4){
+            console.log("Pasando por indhor");
+            indhor = JSON.parse(this.responseText);
+            for (var i = 0; i < indhor.length; i++) {
+                indhor[i][0] = parseInt(indhor[i][0]);
+                indhor[i][1] = parseInt(indhor[i][1]);
+            }
+        }
+    }
+requestindhor.send();
+console.log("indhor: ",indhor);
     let config = {
         type: type, // Charts de tipo 'line' solo usan un color
         data: {
@@ -23,14 +37,52 @@ function setUpChart(canvas, xlabel, type, dataset, chartName, lblStrX, lblStrY, 
             datasets: dataset
         },
         options: {
-            title:{
-                display:true,
-                text: chartName
-            },
-            tooltips: {
-                mode: 'index',
-                intersect: false
-            },
+            plugins: {
+                title: {
+                  display: true,
+                  text: chartName
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+
+                  callbacks: {
+                    beforeTitle: function(tooltipItem){
+
+                      return 'Bloque: '+tooltipItem[0].label
+                    },
+                    title: function(tooltipItem){
+                      // console.log("title: ",typeof tooltipItem[0].label)
+                      for (var i = 0; i < indhor.length; i++) {
+                        if (tooltipItem[0].label >= indhor[i][0] && tooltipItem[0].label <= indhor[i][1]) {
+                            return indhor[i][2];
+                        }
+                    }
+                      return "";
+                    },
+                      label: function(tooltipItem) {
+                          var datasetLabel = config.data.datasets[tooltipItem.datasetIndex].label || '';
+                          var label = datasetLabel + ': ' + tooltipItem.formattedValue;
+                          return label;
+                      }
+                  },
+                },
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    // drag: {
+                    //   enabled: true
+                    // },
+                    mode: 'xy',
+                  }
+                }
+
+              },
             hover: {
                 mode: 'index',
                 intersect: false
@@ -41,25 +93,33 @@ function setUpChart(canvas, xlabel, type, dataset, chartName, lblStrX, lblStrY, 
                 }
             },
             scales: {
-                yAxes: [{
+                y: {
+                  ticks: {
+                    beginAtZero: true
+                  },
+                  scaleLabel: {
                     display: true,
-                    ticks: {
-                        beginAtZero:true
-                    },
-                    stacked: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: lblStrY
-                    }
-                }],
-                xAxes: [{
+                    labelString: lblStrY
+                  }
+                },
+                x: {
+                  scaleLabel: {
                     display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: lblStrX
-                    }
-                }]
-            },
+                    labelString: lblStrX
+                  },
+                  ticks: {
+                    beginAtZero: true,
+                    callback: function(index) {
+                      for (var i = 0; i < indhor.length; i++) {
+                          if (index >= indhor[i][0] && index <= indhor[i][1]) {
+                              return indhor[i][2];
+                          }
+                      }
+                      return "";
+                  }
+                  }
+                }
+              },
             responsive: true
         }
     };
@@ -110,10 +170,10 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
                 // Colores respecto a CONFIG
                 let colorBkg;
                 switch(title) {
-                    case "Serie":
+                    case "hidraulica_serie":
                         colorBkg = CONFIG.COLOR_SERIE;
                         break;
-                    case "Embalse":
+                    case "hidraulica_embalse":
                         colorBkg = CONFIG.COLOR_EMBALSE;
                         break;
                     case "Pasada":
@@ -122,22 +182,22 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
                     case "Minihidro":
                         colorBkg = CONFIG.COLOR_MINIHIDRO;
                         break;
-                    case "Solar":
+                    case "solar_fv":
                         colorBkg = CONFIG.COLOR_SOLAR;
                         break;
-                    case "Eolica":
+                    case "eolica":
                         colorBkg = CONFIG.COLOR_EOLICA;
                         break;
-                    case "Carbon":
+                    case "carbon":
                         colorBkg = CONFIG.COLOR_CARBON;
                         break;
-                    case "Diesel":
+                    case "diesel":
                         colorBkg = CONFIG.COLOR_DIESEL;
                         break;
                     case "GNL":
                         colorBkg = CONFIG.COLOR_GNL;
                         break;
-                    case "Biomasa":
+                    case "biomasa":
                         colorBkg = CONFIG.COLOR_BIOMASA;
                         break;
                     case "Cogeneracion":
@@ -150,10 +210,11 @@ function addDataSets(allData, xAxis, yAxis, setDeDatos, xlabel) {
                 const dataset = {
                   label: title,
                   data: ylabel,
-                  borderWidth: 0,
+                  borderWidth: 1,
                   lineTension: 0,
-                  backgroundColor: colorBkg,
-                  borderColor: colorBkg
+                  backgroundColor: colorBkg.replace(/1(?=[^,\d])/, '0.3'),
+                  borderColor: colorBkg,
+                  fill: true
                 };
                 color += 1;
                 setDeDatos.push(dataset);
@@ -202,7 +263,7 @@ function addCentralData(data, tipo, centralsData, yAxis) {
  * @returns {Function}
  */
 function createCallback(x, m, centralsData, yAxis) {
-    console.log("Pasando por modulo stacked-charts función createCallBack")
+    // console.log("Pasando por modulo stacked-charts función createCallBack")
     return function() {
         if (x.readyState === 4){
             addCentralData(JSON.parse(this.responseText), m, centralsData, yAxis);

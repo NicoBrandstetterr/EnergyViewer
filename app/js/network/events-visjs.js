@@ -853,3 +853,4 @@ logTime("events-visjs.js");
     setTimeout(()=>$("#marginal-cost-toggle").click(),1000);
   }
 })/* */
+

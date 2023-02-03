@@ -13,7 +13,7 @@ function randomColor(seed = null) {
   rgb[(seed+1)%3] = Math.floor(Math.random()*255);
   rgb[(seed+2)%3] = 0;
 
-  return 'rgb(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ')';
+  return 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] +','+'1'+ ')';
 }
 
 /**
@@ -35,11 +35,8 @@ function chartUpdateXAxis(myChart, start, end) {
   }
 
   start.parent().removeClass('wrong-interval');
-  // Se obtienen los subgráficos que se cambian.
-  const xAxes = myChart.config.options.scales.xAxes;
-  const yAxes = myChart.config.options.scales.yAxes;
+  if (!myChart.config.options.scales.y.stacked) {
 
-  if (!myChart.config.options.scales.yAxes[0].stacked) {
     const data = myChart.config.data.datasets;
     let min_y = 0, max_y = 0;
 
@@ -51,21 +48,17 @@ function chartUpdateXAxis(myChart, start, end) {
       }
     }
 
-    // Se guarda en cada uno de los ejes el cambio de eje.
-    for (let i = 0; i < yAxes.length; i++) {
-      myChart.config.options.scales.yAxes[i].ticks.min = min_y*1.05;
-      myChart.config.options.scales.yAxes[i].ticks.max = max_y*1.05;
-    }
-  }
-
   // Se guarda en cada uno de los ejes el cambio de eje.
-  for (let i = 0; i < xAxes.length; i++) {
-    myChart.config.options.scales.xAxes[i].ticks.min = start_val;
-    myChart.config.options.scales.xAxes[i].ticks.max = end_val;
-  }
+  myChart.config.options.scales.y.min = min_y*1.05;
+  myChart.config.options.scales.y.max = max_y*1.05;
+}
 
-  // Se actualiza el gráfico.
-  myChart.update();
+// Se guarda en cada uno de los ejes el cambio de eje.
+myChart.config.options.scales.x.min = start_val;
+myChart.config.options.scales.x.max = end_val;
+
+// Se actualiza el gráfico.
+myChart.update();
 }
 
 /**
@@ -194,7 +187,21 @@ function addGraphEvents(myChart, PDTO, selectedElement) {
 function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
                          labelStrX, labelStrY, xAxis, yAxis, selectedElement, PDTO,elementO=null) {
   console.log("pasando por SetUpSingleData")
-  
+  let indhor;
+  let requestindhor = new XMLHttpRequest();
+  requestindhor.open('GET', CONFIG.URL_INDHOR, false);
+  requestindhor.onreadystatechange = function() {
+    if (this.readyState === 4){
+      console.log("Pasando por indhor");
+      indhor = JSON.parse(this.responseText);
+      for (var i = 0; i < indhor.length; i++) {
+      indhor[i][0] = parseInt(indhor[i][0]);
+      indhor[i][1] = parseInt(indhor[i][1]);
+      }
+    }
+  }
+requestindhor.send();
+console.log("indhor: ",indhor);
   if(elementO===null ) {
 
     let xlabel = [];
@@ -227,7 +234,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
         datasets: [{
           label: title,
           data: ylabel,
-          borderWidth: 0,
+          borderWidth: 2,
           lineTension: 0,
           fill: false,
           backgroundColor: bkgCol,//fillcolor,
@@ -236,14 +243,52 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
         ]
       },
       options: {
-        title: {
-          display: true,
-          text: txt
-        },
-  
-        tooltips: {
-          mode: 'index',
-          intersect: false
+        plugins: {
+          title: {
+            display: true,
+            text: txt
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+
+            callbacks: {
+              beforeTitle: function(tooltipItem){
+
+                return 'Bloque: '+tooltipItem[0].label
+              },
+              title: function(tooltipItem){
+                // console.log("title: ",typeof tooltipItem[0].label)
+                for (var i = 0; i < indhor.length; i++) {
+                  if (tooltipItem[0].label >= indhor[i][0] && tooltipItem[0].label <= indhor[i][1]) {
+                      return indhor[i][2];
+                  }
+              }
+                return "";
+              },
+                label: function(tooltipItem) {
+                    var datasetLabel = config.data.datasets[tooltipItem.datasetIndex].label || '';
+                    var label = datasetLabel + ': ' + tooltipItem.formattedValue;
+                    return label;
+                }
+            }
+          },
+          zoom: {
+                zoom: {
+                  wheel: {
+                    enabled: true,
+                  },
+                  pinch: {
+                    enabled: true
+                  },
+                  // drag: {
+                  //   enabled: true
+                  // },
+                  mode: 'xy',
+                }
+              }
+
+
         },
         hover: {
           mode: 'index',
@@ -255,7 +300,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
           }
         },
         scales: {
-          yAxes: [{
+          y: {
             ticks: {
               beginAtZero: true
             },
@@ -263,29 +308,40 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
               display: true,
               labelString: labelStrY
             }
-          }],
-          xAxes: [{
+          },
+          x: {
             scaleLabel: {
               display: true,
               labelString: labelStrX
             },
             ticks: {
-              beginAtZero: true
+              beginAtZero: true,
+              callback: function(index) {
+                for (var i = 0; i < indhor.length; i++) {
+                    if (index >= indhor[i][0] && index <= indhor[i][1]) {
+                        return indhor[i][2];
+                    }
+                }
+                return "";
             }
-          }]
+            }
+          }
         },
         responsive: true
       }
     };
   
     // Se genera el gráfico ChartJS.
+    console.log(ctx);
+    console.log(config);
     let myChart = new Chart(ctx, config);
+    console.log(myChart);
     
     // Se corrige la responsiveness de los gráficos
     $(window).resize(function() {
       myChart.resize();
     });
-    console.log("configsss: ",config.data.datasets, typeof config.data.datasets, config.data.datasets.length)
+    // console.log("configsss: ",config.data.datasets, typeof config.data.datasets, config.data.datasets.length)
     
     // Se agregan eventos con respecto al grafico creado.
     addGraphEvents(myChart, PDTO, selectedElement);
@@ -324,7 +380,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
       datasets: [{
         label: title,
         data: flujo,
-        borderWidth: 0,
+        borderWidth: 2,
         lineTension: 0,
         fill: false,
         backgroundColor: bkgCol,//fillcolor,
@@ -333,7 +389,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
       {
         label: "Capacidad Máxima",
         data: maximoflujo,
-        borderWidth: 0,
+        borderWidth: 2,
         lineTension: 0,
         fill: false,
         backgroundColor: maxcolor,//fillcolor,
@@ -342,7 +398,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
       {
         label: "Capacidad Minima",
         data: minimoflujo,
-        borderWidth: 0,
+        borderWidth: 2,
         lineTension: 0,
         fill: false,
         backgroundColor: mincolor,//fillcolor,
@@ -356,14 +412,51 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
       type: type, // Charts de tipo 'line' solo usan un color
       data: chartData,
       options: {
-        title: {
-          display: true,
-          text: txt
-        },
-  
-        tooltips: {
-          mode: 'index',
-          intersect: false
+        plugins: {
+          title: {
+            display: true,
+            text: txt
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+
+            callbacks: {
+              beforeTitle: function(tooltipItem){
+
+                return 'Bloque: '+tooltipItem[0].label
+              },
+              title: function(tooltipItem){
+                // console.log("title: ",typeof tooltipItem[0].label)
+                for (var i = 0; i < indhor.length; i++) {
+                  if (tooltipItem[0].label >= indhor[i][0] && tooltipItem[0].label <= indhor[i][1]) {
+                      return indhor[i][2];
+                  }
+              }
+                return "";
+              },
+                label: function(tooltipItem) {
+                    var datasetLabel = config.data.datasets[tooltipItem.datasetIndex].label || '';
+                    var label = datasetLabel + ': ' + tooltipItem.formattedValue;
+                    return label;
+                }
+            },
+          },
+          zoom: {
+            zoom: {
+              wheel: {
+                enabled: true,
+              },
+              pinch: {
+                enabled: true
+              },
+              // drag: {
+              //   enabled: true
+              // },
+              mode: 'xy',
+            }
+          }
+
         },
         hover: {
           mode: 'index',
@@ -375,7 +468,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
           }
         },
         scales: {
-          yAxes: [{
+          y: {
             ticks: {
               beginAtZero: true
             },
@@ -383,16 +476,24 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
               display: true,
               labelString: labelStrY
             }
-          }],
-          xAxes: [{
+          },
+          x: {
             scaleLabel: {
               display: true,
               labelString: labelStrX
             },
             ticks: {
-              beginAtZero: true
+              beginAtZero: true,
+              callback: function(index) {
+                for (var i = 0; i < indhor.length; i++) {
+                    if (index >= indhor[i][0] && index <= indhor[i][1]) {
+                        return indhor[i][2];
+                    }
+                }
+                return "";
             }
-          }]
+            }
+          }
         },
         responsive: true
       }
