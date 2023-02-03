@@ -39,7 +39,7 @@ gReq.onreadystatechange = function () {
     electricEdges = result.edges;
     console.log("se viene creacion de vista georeferenciada")
     //testFunction(geoContainer, nodesMArray, edgesMArray);
-    geoNetwork = generateLLNetwork(geoContainer, nodesMArray, edgesMArray);
+    geoNetwork = generateLLNetwork(geoContainer, nodesMArray);
     // var resultMap = generateNetwork(geoContainer, nodesMArray, edgesMArray, TOPOLOGY_TYPES.GEO);
 	  // createLog('Vista georeferenciada generada correctamente!', LOG_TYPE.SUCCESS)
     // geoNetwork = resultMap.network;
@@ -51,8 +51,6 @@ gReq.onreadystatechange = function () {
     let t5 = performance.now();
     // console.log("final de greq tardó " + (t5-t4) + " milisegundos.")
     console.log("total de greq tardó " + (t5-t0) + " milisegundos.")
-    
-    
   }
 };
 
@@ -89,7 +87,6 @@ bReq.onreadystatechange = function () {
     let t2 = performance.now();
     // console.log("El código breq 2 tardó " + (t2 - t1) + " milisegundos.")
     console.log("final de breq  tardó " + (t2 - t0) + " milisegundos.")
-
   }
   
 };

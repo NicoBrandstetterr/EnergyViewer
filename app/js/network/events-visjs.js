@@ -66,6 +66,7 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
     if (clickedElementObject.category == "bus") {
       createBusImage(clickedElementObject, true);
       currentNodes.update(clickedElementObject);
+      console.log(clickedElementObject);
     }
   });
 

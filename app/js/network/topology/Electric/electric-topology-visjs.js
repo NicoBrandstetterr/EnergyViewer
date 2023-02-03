@@ -38,6 +38,8 @@ function loadElectricTopology(buses, lines, centrals){
   let t5 = performance.now();
   console.log("parseCentrals geoTopology tardó " + (t5-t4) + " milisegundos.")
   console.log("loadElectricTopology tardó " + (t5 - t0) + " milisegundos.")
+  console.log("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+  console.log(buses);
 }
 
 function parseElectricTopologyToNetwork(){

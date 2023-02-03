@@ -114,10 +114,17 @@ function parseBuses(buses, electricTopology, type) {
             io_val = ""
         }
     }
+
+    // let tooltip = generateTooltip(["Barra: " + buses[i].name.replace(/_/gi, " "), 
+    //                               "Activo: " + buses[i].active, 
+    //                               "Costo marginal: " + parseFloat(currentBusTime.marginal_cost).toFixed(1) + " [USD/MWh]", 
+    //                               "Demanda-Energía: " + parseFloat(currentBusTime.DemBarE).toFixed(1) + " [MWh]",
+    //                               "Demanda-Potencia: " + parseFloat(currentBusTime.DemBarP).toFixed(1) + " [MW]"]);
     
     // Creamos el nodo de la barra con sus caracteristicas correspondientes.
     let barra = {
       id: buses[i].id,
+      // title: tooltip,
       font: {
         size: 30
       },
@@ -142,11 +149,6 @@ function parseBuses(buses, electricTopology, type) {
     };
     let T4 = performance.now();
     List[3].push(T4-T3);
-	let imageConfig = {
-		hasLoad: hasLoad,
-		hasGenerators: hasGenerators,
-    type: buses[i].type
-	};
 	let T5 = performance.now();
   List[4].push(T5-T4);
   createBusImage(barra);
@@ -231,6 +233,7 @@ function parseBuses(buses, electricTopology, type) {
       }
     }
   }
+  getNodesUpdates();
 }
 
 /**
