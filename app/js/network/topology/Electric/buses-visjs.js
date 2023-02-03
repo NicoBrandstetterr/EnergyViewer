@@ -330,41 +330,14 @@ function getNodesUpdates(){
       title: tooltip,
       marginal_cost: currentBusTime.marginal_cost,
       demandE: currentBusTime.DemBarE,
-      demandP: currentBusTime.DemBarP
+      demandP: currentBusTime.DemBarP,
+      type: inodes[i].type,
+      hasLoad: inodes[i].hasLoad,
+		  hasGenerators: inodes[i].hasGenerators,
+      label: inodes[i].nodeName
     };
 	
-		const configSelected = {
-		  hasLoad: inodes[i].hasLoad,
-		  hasGenerators: inodes[i].hasGenerators,
-		  selected: true,
-		  label: inodes[i].nodeName,
-		};
-
-		const configUnselected = {
-		  hasLoad: inodes[i].hasLoad,
-		  hasGenerators: inodes[i].hasGenerators,
-		  selected: false,
-		  label: inodes[i].nodeName
-		};
-
-		node.image = {
-			unselected: createBusImage(configUnselected,
-			  {
-				'costo_marginal':
-				  {
-					shape: 'circle',
-					value: currentBusTime.marginal_cost
-				  }
-			  }),
-			selected: createBusImage(configSelected,
-			  {
-				'costo_marginal':
-				  {
-					shape: 'circle',
-					value: currentBusTime.marginal_cost
-				  }
-			  })
-		  };
+    createBusImage(node);
 		  
     inodes[i].marginal_cost = currentBusTime.marginal_cost;
     inodes[i].demandE = currentBusTime.DemBarE;
