@@ -92,7 +92,6 @@ function focusNode(network, id)
   	toggleGeneratorsOn(node.reference.barra);
   }
   network.focus(id, options);
-
 }
 
 /**
@@ -149,7 +148,13 @@ function buildDropdownTimes(times)
 function goToSelectedNode()
 {
 	var select = document.getElementById('search-dropdown');
-	goToNode(currentNetwork, currentNodes, select.value);  
+  switch (currentTopologyType){
+    case 3:
+      goToGeoNode(currentNetwork, currentNodes, select.value);
+    break;
+    default:
+      goToNode(currentNetwork, currentNodes, select.value);
+  }
 }
 
 /**
@@ -161,6 +166,11 @@ function goToNode(network,nodes,id)
 {
   focusNode(network, id);
   network.emit("zoom", {scale: network.getScale()});
+}
+
+function goToGeoNode(network,nodes,id){
+  let obj = nodes.get(id);
+  network.flyTo([obj.latitude, obj.longitude], 13, {duration: 1.25});
 }
 
 /**

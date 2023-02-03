@@ -93,48 +93,70 @@ function parseBuses(buses, electricTopology, type) {
     const hasGenerators = false;
     let T3 = performance.now();
     List[2].push(T3-T2);
+
+    let io_val;
+    switch (hasGenerators){
+      case true:
+        switch (hasLoad){
+          case true:
+            io_val = "_io"
+            break
+          default:
+            io_val = "_i"
+        }
+        break
+      default:
+        switch (hasLoad){
+          case true:
+            io_val = "_o"
+            break
+          default:
+            io_val = ""
+        }
+    }
+    
     // Creamos el nodo de la barra con sus caracteristicas correspondientes.
     let barra = {
       id: buses[i].id,
       font: {
         size: 30
       },
-      label: buses[i].name.replace(/_/gi," "),
+      label: buses[i].name.replace(/_/gi, " "),
       active: buses[i].active,
       shape: 'image',
-	    size: 40,
+      size: 40,
       marginal_cost: currentBusTime.marginal_cost,
       demandE: currentBusTime.DemBarE,
       demandP: currentBusTime.DemBarP,
       maxSize: 40,
       // Variables relacionadas con lo que son las barras.
       category: 'bus',
-      nodeName: buses[i].name.replace(/_/gi," "),
+      nodeName: buses[i].name.replace(/_/gi, " "),
       generadores: [], // Lista de los generadores que tiene la barr
 
-    // Actualizamos los datos en los tooltipa.
+      // Actualizamos los datos en los tooltipa.
       displaying: false, // Nos indica si se estan mostrando los generadores de la barra.
-	  hasLoad: hasLoad,
-	  hasGenerators: hasGenerators
+      hasLoad: hasLoad,
+      hasGenerators: hasGenerators,
+      type: buses[i].type
     };
     let T4 = performance.now();
     List[3].push(T4-T3);
 	let imageConfig = {
 		hasLoad: hasLoad,
 		hasGenerators: hasGenerators,
-		label: barra.nodeName
+    type: buses[i].type
 	};
 	let T5 = performance.now();
   List[4].push(T5-T4);
-	barra.image = {};
-	barra.image.unselected = createBusImage(imageConfig);
-	imageConfig.selected = true;
-	barra.image.selected = createBusImage(imageConfig);
+  createBusImage(barra);
   let T6 = performance.now();
   List[5].push(T6-T5);
 
     barra.x = buses[i].longitude * -escala;
     barra.y = buses[i].latitude * escala;
+    barra.longitude = buses[i].longitude;
+    barra.latitude = buses[i].latitude;
     barra.validCoords = !(zero(barra.x) && zero(barra.y));
 	let T7 = performance.now();
   List[6].push(T7-T6);

@@ -11,11 +11,15 @@
         <link rel="stylesheet" href="css/search.css" type="text/css"/>
         <link rel="stylesheet" href="css/chosen.min.css">
 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+
         <link href="css/index.css" rel="stylesheet" type="text/css" />
         <link href="css/vis.css" rel="stylesheet" type="text/css" />
         <link href="css/visjs.css" rel="stylesheet" type="text/css" />
         <link href="css/chartjs.css" rel="stylesheet" type="text/css" />
         <link href="css/vis-network.min.css" rel="stylesheet" type="text/css" />
+        <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
     </head>
 
     <body id="body" onload='$("body").css("cursor", "default");'>
@@ -433,28 +437,36 @@
                                 <img id="logo-centro-energia" src="resources/logo.png" alt="logo centro de energía"/>
                             </a>
                         </div>
-                        Este software fue realizado por
-                        <ul>
-                            <li>Javier Díaz P.</li>
-                            <li>José Daniel Muñoz R.</li>
-                            <li>Paloma Pérez G.</li>
-                            <li>Joaquín Romero M.</li>
-                            <li>Gabriel Sanhueza S.</li>
-                            <li>Joaquin Torres P.</li>
-                        </ul>
-                        Íconos de generadores por
-                        <ul>
-                            <li>Freepik de <a href="https://www.flaticon.com" target="_blank">Flaticon</a></li>
-                            <li>Daniel Bruce de <a href="https://www.flaticon.com" target="_blank">Flaticon</a></li>
-                            <li>Those Icons de <a href="https://www.flaticon.com" target="_blank">Flaticon</a></li>
-                        </ul>
-                        Íconos de play, pause y fast-forward por
-                        <ul>
-                            <li>Daniele De Santis de <a href="https://www.flaticon.com" target="_blank">Flaticon</a></li>
-                        </ul>
+
+
+                        <div class="pull-left modal-contents">
+                            Este software es desarrollado por el Centro de Energía de la Universidad de Chile.
+                            <br>
+                            <br>
+                            La primera versión de esta aplicación fue programada el 2018 por:
+                            <br>
+                            <br>
+                            Javier Díaz P. & José Daniel Muñoz R.
+                            <br>
+                            Paloma Pérez G. & Joaquín Romero M.
+                            <br>
+                            Gabriel Sanhueza S. & Joaquin Torres P.
+                            <br>
+                            <br>
+                            Para consultas sobre este desarrollo, enviar correo a 
+                            <a href = "mailto: contacto@centroenergia.cl">contacto@centroenergia.cl</a>
+                            <br>
+                            <br>
+                            Íconos usados dentro de la aplicación:
+                            <ul>
+                                <li>Desde <a href="https://www.flaticon.com" target="_blank">Flaticon</a> por:</li>
+                                Freepik & Daniel Bruce & Those Icons & Daniele De Santis
+                            </ul>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-default modal-button" data-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
 
@@ -513,6 +525,7 @@
         <script type="text/javascript" src="js/network/topology/Hydric/hydric-topology-visjs.js"></script>
         <script type="text/javascript" src="js/network/events-visjs.js"></script>
         <script type="text/javascript" src="js/network/action-visjs.js"></script>
+        <script type="text/javascript" src="js/network/leaflet-map.js"></script>
 
         <script type="text/javascript" src="js/loaders/hydrology-loader.js"></script>
         <script type="text/javascript" src="js/loaders/electric-topology-loader.js"></script>

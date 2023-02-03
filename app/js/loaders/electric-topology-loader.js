@@ -18,7 +18,8 @@ gReq.onreadystatechange = function () {
     let t0 = performance.now();
     generators = JSON.parse(this.responseText);
 	  createLog('Archivo de generadores leído', LOG_TYPE.SUCCESS)
-    console.log("Tiempo de carga centrals topology:" + (performance.now()-t0) + " milisegundos.");
+    console.log("pasando por gReq.onreadystatechange")
+
     let t1 = performance.now();
     // console.log("generators = JSON.parse(this.responseText); tardó " + (t1 - t0) + " milisegundos.")
     loadElectricTopology(buses, lines, generators);
@@ -36,13 +37,15 @@ gReq.onreadystatechange = function () {
     electricNetwork = result.network;
     electricNodes = result.nodes;
     electricEdges = result.edges;
-    console.log("se viene creacion de vista georeferenciada");
-    var resultMap = generateNetwork(geoContainer, nodesMArray, edgesMArray, TOPOLOGY_TYPES.GEO);
-	  createLog('Vista georeferenciada generada correctamente!', LOG_TYPE.SUCCESS)
-    geoNetwork = resultMap.network;
-    geoNodes = resultMap.nodes;
-    geoEdges = resultMap.edges;
-    enableDrag(geoNetwork, $('#my-geo-network'), geoNodes);
+    console.log("se viene creacion de vista georeferenciada")
+    //testFunction(geoContainer, nodesMArray, edgesMArray);
+    geoNetwork = generateLLNetwork(geoContainer, nodesMArray, edgesMArray);
+    // var resultMap = generateNetwork(geoContainer, nodesMArray, edgesMArray, TOPOLOGY_TYPES.GEO);
+	  // createLog('Vista georeferenciada generada correctamente!', LOG_TYPE.SUCCESS)
+    // geoNetwork = resultMap.network;
+    // geoNodes = resultMap.nodes;
+    // geoEdges = resultMap.edges;
+    // enableDrag(geoNetwork, $('#my-geo-network'), geoNodes);
     toElectricView();
     enableDrag(electricNetwork, $('#my-electric-network'), electricNodes);
     let t5 = performance.now();

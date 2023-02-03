@@ -71,6 +71,7 @@ hr {
 	position: absolute;
 	top: 0px; padding: 0px;
 	list-style: none;
+	z-index: 100;
 }
 
 #canvas-selector>li {
@@ -82,6 +83,7 @@ hr {
 	display: block;
 	font-size: small;
 	font-family: "Arial", Arial, Serif;
+	z-index: 101;
 }
 
 #context-menu>ul.list {
@@ -257,6 +259,29 @@ p.clickable:hover {
 
 .lmargin {
 	margin-left: 1em;
+}
+
+.modal-contents {
+	width: 60%;
+}
+
+.modal-header {
+	border-bottom: 0;
+}
+
+.modal-body {
+	border-bottom: 0;
+}
+
+.modal-footer {
+	border-top: 0;
+	height: 100%;
+}
+
+.modal-button {
+	position: absolute;
+	bottom: 15px;
+	right: 15px;
 }
 
 div.chosen-container {
