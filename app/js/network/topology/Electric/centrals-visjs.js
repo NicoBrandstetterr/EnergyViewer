@@ -125,17 +125,7 @@ function parseCentrals(centrals, electricTopology, topologyType) {
 	
 	if (!barraGenerador.hasGenerators) {
 		barraGenerador.hasGenerators = true;
-		
-		let imageConfig = {
-			hasLoad: barraGenerador.hasLoad,
-			hasGenerators: barraGenerador.hasGenerators
-		}
-	
-		barraGenerador.image = {};
-		barraGenerador.image.unselected = createBusImage(imageConfig);
-		imageConfig.selected = true;
-		barraGenerador.image.selected = createBusImage(imageConfig);
-
+    createBusImage(barraGenerador);
 	}
 
 	var centralToBarDistance = 10;

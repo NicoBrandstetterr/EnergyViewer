@@ -64,7 +64,7 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
     let clickedElementID = network.getNodeAt(params.pointer.DOM);
     let clickedElementObject = currentNodes.get(clickedElementID);
     if (clickedElementObject.category == "bus") {
-      ImageDispatch(clickedElementObject);
+      createBusImage(clickedElementObject, true);
       currentNodes.update(clickedElementObject);
     }
   });
@@ -231,7 +231,6 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
     if (network.getNodeAt(params.pointer.DOM)) {
       clickedElementID = network.getNodeAt(params.pointer.DOM);
       clickedElementObject = currentNodes.get(clickedElementID);
-      //console.log(clickedElementObject.category);
 
       // Vemos el tipo del nodo para crear el menú correspondiente.
       switch (clickedElementObject.category) {
@@ -358,7 +357,6 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
 
     // Esto se ejecuta al terminar de dibujar la red.
     network.on("afterDrawing", function (ctx) {
-
 
       // En caso de tener activada la animación.
       if ($("#animation-enabled")[0].checked) {
@@ -856,94 +854,3 @@ logTime("events-visjs.js");
   }
 })/* */
 
-function ImageDispatch(node) {
-  let img_id = node.image_id;
-  if (img_id === undefined) {
-    img_id = 0;
-  }
-  switch (img_id) {
-    case 0:
-      VBusImage(node);
-      node.image_id = 1;
-      break;
-    case 1:
-      DotBusImage(node);
-      node.image_id = 2;
-      break;
-    default:
-      HBusImage(node);
-      node.image_id = 0;
-  }
-}
-
-function HBusImage(node){
-  let new_image;
-  if (node.hasGenerators || node.hasLoad){
-    if (node.hasGenerators && node.hasLoad){
-		  new_image = "./resources/network/icons/bus/normal/bus_h_io.svg";
-    }
-    else{
-      if (node.hasGenerators){
-        new_image = "./resources/network/icons/bus/normal/bus_h_i.svg";
-      }
-      else{
-        new_image = "./resources/network/icons/bus/normal/bus_h_o.svg";
-      }
-    }
-	}
-  else{
-	  new_image = "./resources/network/icons/bus/normal/bus_h.svg";
-  }
-
-  node.image.selected = new_image;
-  node.image.unselected = new_image;
-  node.maxSize = 40;
-}
-
-function VBusImage(node){
-  let new_image;
-  if (node.hasGenerators || node.hasLoad){
-    if (node.hasGenerators && node.hasLoad){
-		  new_image = "./resources/network/icons/bus/normal/bus_v_io.svg";
-    }
-    else{
-      if (node.hasGenerators){
-        new_image = "./resources/network/icons/bus/normal/bus_v_i.svg";
-      }
-      else{
-        new_image = "./resources/network/icons/bus/normal/bus_v_o.svg";
-      }
-    }
-	}
-  else{
-	  new_image = "./resources/network/icons/bus/normal/bus_v.svg";
-  }
-
-  node.image.selected = new_image;
-  node.image.unselected = new_image;
-  node.maxSize = 100;
-}
-
-function DotBusImage(node){
-  let new_image;
-  if (node.hasGenerators || node.hasLoad){
-    if (node.hasGenerators && node.hasLoad){
-		  new_image = "./resources/network/icons/bus/normal/bus_dot_io.svg";
-    }
-    else{
-      if (node.hasGenerators){
-        new_image = "./resources/network/icons/bus/normal/bus_dot_i.svg";
-      }
-      else{
-        new_image = "./resources/network/icons/bus/normal/bus_dot_o.svg";
-      }
-    }
-	}
-  else{
-	  new_image = "./resources/network/icons/bus/normal/bus_dot.svg";
-  }
-
-  node.image.selected = new_image;
-  node.image.unselected = new_image;
-  node.maxSize = 120;
-}
