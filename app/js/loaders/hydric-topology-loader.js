@@ -13,7 +13,10 @@ gReq.onreadystatechange = function () {
   if (this.readyState === 4) {
     rs = JSON.parse(this.responseText);
 	createLog('Archivo de embalses leído', LOG_TYPE.SUCCESS)
+    console.log("en gReq, se viene loadHydricTopology");
+    
     loadHydricTopology(jt, wt, rs);
+    console.log("pasooooo");
     parseHydricTopologyToNetwork();
     var result = generateNetwork(hydricContainer, nodesHArray, edgesHArray, TOPOLOGY_TYPES.HYDRIC);
 	createLog('Red hídrica generada correctamente!', LOG_TYPE.SUCCESS)

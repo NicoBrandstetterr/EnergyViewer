@@ -51,5 +51,6 @@ fabric.properties
 
 # EnergyViewer dev
 app/resources/browser/Data
-config/
 data/
+PLP20230104
+app/resources/browser/GoogleChromePortable

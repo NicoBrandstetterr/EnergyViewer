@@ -43,6 +43,7 @@ var nodesSelected = [];
  * @param type Tipo de topología
  */
 function parseBuses(buses, electricTopology, type) {
+  console.log("pasando por parseBuses")
   //  Necesitamos formar los nodos a partir de las barras [id: #, label: "nombre"]
   let i;
 // Deben ser del estilo [{id: 1, label: "Maitencillo"}, {id: 2, label: "La Serena"}]
@@ -64,7 +65,8 @@ function parseBuses(buses, electricTopology, type) {
   let badCoordinatesLog = null;
   let t0 = performance.now();
   let List = [[],[],[],[],[],[],[],[],[]];
-  console.log("buses.length: ", buses.length)
+  // console.log("buses.length: ", buses.length)
+  console.log("hidrotimes 1: ",hydrologyTimes)
   for (i = 0; i < buses.length; i++) {
 
     // Variable para dejar en el label si esta activo en forma intuitiva.
@@ -86,7 +88,8 @@ function parseBuses(buses, electricTopology, type) {
     maxid = Math.max(buses[i].id, maxid);
     let T2 = performance.now();
     List[1].push(T2-T1);
-    const hasLoad = getBusLoad(buses[i].id,i);
+    const hasLoad = getBusLoad(buses[i].id);
+    // const hasLoad = false;
     const hasGenerators = false;
     let T3 = performance.now();
     List[2].push(T3-T2);
@@ -209,10 +212,11 @@ function parseBuses(buses, electricTopology, type) {
 	let T9 = performance.now()
   List[8].push(T9-T8);
   }
-  for (let i = 0; i < List.length; i++) {
-    let suma = List[i].reduce((a,b) => a+b);
-    console.log(`La suma de la lista ${i+1} es: ${suma}`);
-  }
+  console.log("hidrotimes 2: ",hydrologyTimes)
+  // for (let i = 0; i < List.length; i++) {
+  //   let suma = List[i].reduce((a,b) => a+b);
+  //   console.log(`La suma de la lista ${i+1} es: ${suma}`);
+  // }
 
   let t1 = performance.now();
   console.log("parseBus despues de for linea 66 tardó " + (t1-t0) + " milisegundos.")
@@ -390,11 +394,9 @@ function updateBuses(nodes){
  * @param busID Identificador de la barra
  * @returns {boolean} true si los datos están cargados, false si no.
  */
-function getBusLoad(busID,a=2){
+function getBusLoad(busID){
 // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-// console.log("Entrando a getBusLoad");
-let t0 = performance.now();
-
+  // console.log("Entrando a getBusLoad");
   if (CONFIG.RESULTS_DISABLED) return;
   let busLoad=false;
 
@@ -418,6 +420,7 @@ let t0 = performance.now();
     };
   };
 
+
   /* Si los datos estan cargados se ejecuta este método. */
   let preLoad = function (data) {
     for(let i = 0; i < data.length; i++){
@@ -428,13 +431,8 @@ let t0 = performance.now();
     }
   };
 
-  let t1 = performance.now();
   loadBusFile(busID, preLoad, callBack, chosenHydrology);
-  let t2 = performance.now();
-  if (a === 0){
-    console.log("primera parte getBusLoad tardó " + (t1-t0) + " milisegundos.")
-    console.log("loadBusFile tardó " + (t2-t1) + " milisegundos.")
-  }
+
   
   // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
   return busLoad;

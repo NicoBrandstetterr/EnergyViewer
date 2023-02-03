@@ -18,6 +18,7 @@ var electricMapTopology = {
 
 function loadElectricTopology(buses, lines, centrals){
   console.log("pasando por loadElectricTopology")
+  console.log("hidrotimes 0: ",hydrologyTimes)
   // Parseamos las variables recibidas.
   let t0 = performance.now();
   console.log("----------------------------------------------------------------")

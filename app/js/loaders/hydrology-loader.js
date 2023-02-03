@@ -130,7 +130,6 @@ function loadLineFile(lineID, hydro, noLineResultsLog){
  *
  */
 function loadBusFile(busId, noLoadAction , loadAction, hydro) {
-
   if(typeof hydro === 'undefined') hydro = chosenHydrology;
 
   // Verifica si esta la estructura de datos necesaria.

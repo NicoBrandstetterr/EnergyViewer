@@ -27,12 +27,14 @@ function updateHydrology() {
   console.log("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
   console.log("Pasando por UpdateHydrology")
   let t0 = performance.now();
-  
+  hydrologyTimes = {};
 
+  
   var select = document.getElementById("hydrology-picker");
   
   // Tomamos el valor del select.
   chosenHydrology = parseInt(select.options[select.selectedIndex].value);
+
 //   console.log("Tiempo en obtener valores del select: ",time-getCurrentTime(),"ms")
 
   // Cargamos los archivos necesarios
@@ -48,10 +50,11 @@ function updateHydrology() {
   let t3 = performance.now();
   console.log("updateHydrology updateLines tardó " + (t3-t2) + " milisegundos.")
 
+  console.log("hidrotimes 3: ",hydrologyTimes)
   updateBuses(currentNodes);
   let t4 = performance.now();
   console.log("updateHydrology updateBuses tardó " + (t4-t3) + " milisegundos.")
-  
+  console.log("hidrotimes 4: ",hydrologyTimes)
 
   // updateCentrals(currentNodes); 
   let t5 = performance.now();
@@ -60,6 +63,7 @@ function updateHydrology() {
 
   // Cambiamos la ruta de los archivos.
   changeConfigHydrology();
+
   let t6 = performance.now();
   console.log("updateHydrology changeConfigHydrology tardó " + (t6-t5) + " milisegundos.")
   console.log("updateHydrology En TOTAL tardó " + (t6-t0) + " milisegundos.")
