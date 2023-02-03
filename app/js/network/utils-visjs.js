@@ -380,3 +380,69 @@ function createBusImage(dirtyConfig, metrics) {
 }
 
 logTime("utils-visjs.js");
+
+
+function testf(){
+	console.log("TESTING ")
+}
+
+function createBusImage(barra, swap = false){
+	let io_val;
+    switch (barra.hasGenerators){
+      case true:
+        switch (barra.hasLoad){
+          case true:
+            io_val = "_io"
+            break
+          default:
+            io_val = "_i"
+        }
+        break
+      default:
+        switch (barra.hasLoad){
+          case true:
+            io_val = "_o"
+            break
+          default:
+            io_val = ""
+        }
+    }
+
+	if (swap){
+		let objective;
+		switch (barra.type){
+			case "bus_v":
+				objective = "bus_dot"
+				break
+			case "bus_dot":
+				objective = "bus_h"
+				break
+			default:
+				objective = "bus_v"
+		}
+		barra.type = objective;
+	}
+
+	switch (barra.type){
+		case "bus_v":
+			//barra.size = 40;
+			barra.maxSize = 100;
+			break
+		case "bus_dot":
+			//barra.size = 40;
+			barra.maxSize = 120;
+			break
+		default:
+			//barra.size = 40;
+			barra.maxSize = 40;
+	}
+
+	if (!barra.type){
+		barra.type = "bus_h";
+	}
+
+	barra.image = {
+		selected: "./resources/network/icons/bus/selected/" + barra.type + io_val + ".svg",
+		unselected: "./resources/network/icons/bus/selected/" + barra.type + io_val + ".svg"
+	}
+}

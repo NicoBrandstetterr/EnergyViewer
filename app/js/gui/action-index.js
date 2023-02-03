@@ -138,16 +138,15 @@ function toGeoView() {
   $.each($(".geo"), function(index, value) { value.classList.remove("hidden"); });
 
   if(! fitInit[TOPOLOGY_TYPES.GEO] ) {
-    geoNetwork.fit();
     fitInit[TOPOLOGY_TYPES.GEO] = true;
   }
   currentNetwork = geoNetwork;
-  currentNodes = geoNodes;
-  currentEdges = geoEdges;
+  currentNodes = electricNodes;
+  currentEdges = electricEdges;
   currentContainer = geoContainer;
-  currentNetwork.emit("zoom", {scale: currentNetwork.getScale()});
-  buildDropdown(currentNodes);
+  makeLLdropdown(currentNodes);
   mapVision(true);
+  window.dispatchEvent(new Event('resize'));
 }
 
 
