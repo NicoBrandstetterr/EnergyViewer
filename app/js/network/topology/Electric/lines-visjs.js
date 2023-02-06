@@ -64,7 +64,8 @@ function parseLines(lines, electricTopology) {
          //console.log("Error: La carga de la hidrología actual falló"); //FIXME
     }
     
-    let tooltip = generateTooltip(["Línea: " + "",
+    let tooltip = generateTooltip([
+                                  "Línea: " + lines[i].name,
                                   "Activo: " + active,
                                   "Capacidad: " + lines[i].capacity + " [MW]", 
                                   // "Flujo máximo: " + parseFloat(currentLineTime.capacity).toFixed(1) + " [MW]", 
@@ -91,6 +92,7 @@ function parseLines(lines, electricTopology) {
   let linea =
     {
       id: maxid,
+      name: lines[i].name,
       lineNumber: lines[i].id,
       capacity: lines[i].capacity,
       resistance: lines[i].r,
@@ -157,7 +159,7 @@ function getUpdates(){
 
   let updates = [];
   let datosInvalidosLog;
-  
+  console.log("iedges: ",iedges);
   for (let i = 0; i < iedges.length; i++) {
 
     let currentLineTime = {
@@ -166,9 +168,9 @@ function getUpdates(){
     };
     
     // Nombre de la línea
-    let bus_a = currentNodes.get(iedges[i].from).nodeName;
-    let bus_b = currentNodes.get(iedges[i].to).nodeName;
-    let lineName = bus_a + " -> " + bus_b;
+    // let lineName = bus_a + " -> " + bus_b;
+    
+    let lineName = iedges[i].name;
     
     // Verificar posibles errores
     if (chosenHydrology in hydrologyTimes && 'lines' in hydrologyTimes[chosenHydrology]) {

@@ -114,10 +114,17 @@ function parseBuses(buses, electricTopology, type) {
             io_val = ""
         }
     }
+
+    // let tooltip = generateTooltip(["Barra: " + buses[i].name.replace(/_/gi, " "), 
+    //                               "Activo: " + buses[i].active, 
+    //                               "Costo marginal: " + parseFloat(currentBusTime.marginal_cost).toFixed(1) + " [USD/MWh]", 
+    //                               "Demanda-Energía: " + parseFloat(currentBusTime.DemBarE).toFixed(1) + " [MWh]",
+    //                               "Demanda-Potencia: " + parseFloat(currentBusTime.DemBarP).toFixed(1) + " [MW]"]);
     
     // Creamos el nodo de la barra con sus caracteristicas correspondientes.
     let barra = {
       id: buses[i].id,
+      // title: tooltip,
       font: {
         size: 30
       },
@@ -142,11 +149,6 @@ function parseBuses(buses, electricTopology, type) {
     };
     let T4 = performance.now();
     List[3].push(T4-T3);
-	let imageConfig = {
-		hasLoad: hasLoad,
-		hasGenerators: hasGenerators,
-    type: buses[i].type
-	};
 	let T5 = performance.now();
   List[4].push(T5-T4);
   createBusImage(barra);
@@ -231,6 +233,7 @@ function parseBuses(buses, electricTopology, type) {
       }
     }
   }
+  getNodesUpdates();
 }
 
 /**
@@ -334,41 +337,14 @@ function getNodesUpdates(){
       title: tooltip,
       marginal_cost: currentBusTime.marginal_cost,
       demandE: currentBusTime.DemBarE,
-      demandP: currentBusTime.DemBarP
+      demandP: currentBusTime.DemBarP,
+      type: inodes[i].type,
+      hasLoad: inodes[i].hasLoad,
+		  hasGenerators: inodes[i].hasGenerators,
+      label: inodes[i].nodeName
     };
 	
-		const configSelected = {
-		  hasLoad: inodes[i].hasLoad,
-		  hasGenerators: inodes[i].hasGenerators,
-		  selected: true,
-		  label: inodes[i].nodeName,
-		};
-
-		const configUnselected = {
-		  hasLoad: inodes[i].hasLoad,
-		  hasGenerators: inodes[i].hasGenerators,
-		  selected: false,
-		  label: inodes[i].nodeName
-		};
-
-		node.image = {
-			unselected: createBusImage(configUnselected,
-			  {
-				'costo_marginal':
-				  {
-					shape: 'circle',
-					value: currentBusTime.marginal_cost
-				  }
-			  }),
-			selected: createBusImage(configSelected,
-			  {
-				'costo_marginal':
-				  {
-					shape: 'circle',
-					value: currentBusTime.marginal_cost
-				  }
-			  })
-		  };
+    createBusImage(node);
 		  
     inodes[i].marginal_cost = currentBusTime.marginal_cost;
     inodes[i].demandE = currentBusTime.DemBarE;
