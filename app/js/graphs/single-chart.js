@@ -201,7 +201,7 @@ function setUpSingleData(data,canvas, title, type, bkgCol, brdCol, txt,
     }
   }
 requestindhor.send();
-console.log("indhor: ",indhor);
+// console.log("indhor: ",indhor);
   if(elementO===null ) {
 
     let xlabel = [];
@@ -506,7 +506,7 @@ console.log("indhor: ",indhor);
     $(window).resize(function() {
       myChart.resize();
     });
-    console.log("configsss: ",config.data.datasets)
+    // console.log("configsss: ",config.data.datasets)
     // Se agregan eventos con respecto al grafico creado.
     addGraphEvents(myChart, PDTO, selectedElement);
   

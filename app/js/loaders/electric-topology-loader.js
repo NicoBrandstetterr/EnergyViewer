@@ -60,6 +60,7 @@ lReq.onreadystatechange = function () {
     let t0 = performance.now();
     console.log("pasando por lReq.onreadystatechange")
     lines = JSON.parse(this.responseText);
+    console.log("Tiempo de carga lines parse:" + (performance.now()-t0) + " milisegundos.");
     if(!CONFIG.RESULTS_DISABLED) loadLinesFiles();
     createLog('Archivo de líneas leído', LOG_TYPE.SUCCESS);
     console.log("Tiempo de carga lines topology:" + (performance.now()-t0) + " milisegundos.");
@@ -73,7 +74,7 @@ lReq.onreadystatechange = function () {
 bReq.onreadystatechange = function () {
   
   if (this.readyState === 4) {
-    console.log("hidrotimes -1: ",hydrologyTimes)
+    // console.log("hidrotimes -1: ",hydrologyTimes)
     console.log("pasando por bReq.onreadystatechange")
     // console.log(process.versions.v8)
     // console.log("version: ",process.versions.node)

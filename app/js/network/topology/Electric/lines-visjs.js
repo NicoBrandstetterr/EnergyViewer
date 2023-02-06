@@ -159,7 +159,6 @@ function getUpdates(){
 
   let updates = [];
   let datosInvalidosLog;
-  console.log("iedges: ",iedges);
   for (let i = 0; i < iedges.length; i++) {
 
     let currentLineTime = {

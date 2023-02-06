@@ -50,11 +50,11 @@ function updateHydrology() {
   let t3 = performance.now();
   console.log("updateHydrology updateLines tardó " + (t3-t2) + " milisegundos.")
 
-  console.log("hidrotimes 3: ",hydrologyTimes)
+  // console.log("hidrotimes 3: ",hydrologyTimes)
   updateBuses(currentNodes);
   let t4 = performance.now();
   console.log("updateHydrology updateBuses tardó " + (t4-t3) + " milisegundos.")
-  console.log("hidrotimes 4: ",hydrologyTimes)
+  // console.log("hidrotimes 4: ",hydrologyTimes)
 
   // updateCentrals(currentNodes); 
   let t5 = performance.now();

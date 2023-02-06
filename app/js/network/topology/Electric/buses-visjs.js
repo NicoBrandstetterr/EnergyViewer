@@ -66,7 +66,7 @@ function parseBuses(buses, electricTopology, type) {
   let t0 = performance.now();
   let List = [[],[],[],[],[],[],[],[],[]];
   // console.log("buses.length: ", buses.length)
-  console.log("hidrotimes 1: ",hydrologyTimes)
+  // console.log("hidrotimes 1: ",hydrologyTimes)
   for (i = 0; i < buses.length; i++) {
 
     // Variable para dejar en el label si esta activo en forma intuitiva.
@@ -214,7 +214,7 @@ function parseBuses(buses, electricTopology, type) {
 	let T9 = performance.now()
   List[8].push(T9-T8);
   }
-  console.log("hidrotimes 2: ",hydrologyTimes)
+  // console.log("hidrotimes 2: ",hydrologyTimes)
   // for (let i = 0; i < List.length; i++) {
   //   let suma = List[i].reduce((a,b) => a+b);
   //   console.log(`La suma de la lista ${i+1} es: ${suma}`);
