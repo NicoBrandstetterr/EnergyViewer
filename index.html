@@ -1,6 +1,214 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+  <!-- <head>
     <meta http-equiv="Refresh" content="0; url=app/home.html" />
   </head>
+ -->
+  <head>
+      <meta charset="UTF8"/>
+      <title>EnergyViewer</title>
+
+      <link rel="icon" href="app/resources/icono.png" type="image/x-png"/>
+      <link rel="stylesheet" href="app/lib/css/bootstrap.min.css" type="text/css"/>
+      <link rel="stylesheet" href="app/css/menubar.css" type="text/css"/>
+
+      <link rel="stylesheet" href="app/css/search.css" type="text/css"/>
+      <link rel="stylesheet" href="app/css/chosen.min.css">
+
+      <link href="app/css/index.css" rel="stylesheet" type="text/css" />
+      <link href="app/css/vis.css" rel="stylesheet" type="text/css" />
+      <link href="app/css/visjs.css" rel="stylesheet" type="text/css" />
+      <link href="app/css/home.css" rel="stylesheet" type="text/css" />
+      <link href="app/css/home.scss" rel="stylesheet" type="text/scss" />
+      <link href="app/css/chartjs.css" rel="stylesheet" type="text/css" />
+      <link href="app/css/vis-network.min.css" rel="stylesheet" type="text/css" />
+
+  </head>
+
+  <body class="fixed-window">
+  <div class="container">
+      <!-- About Modal -->
+      <div id="home">
+          <div class="home-dialog modal-sm center-dialog ">
+
+              <!-- Modal content-->
+              <div class="modal-content home-body">
+                  <div class="modal-header center-header no-padding">
+                      <div class="navbar-brand logo">
+                          <a href="https://centroenergia.cl/">
+                              <img id="logo-centro-energia" src="app/resources/logo.png" alt="logo centro de energía"/>
+                          </a>
+                      </div>
+                  </div>
+                  <div class="modal-header center-header no-padding">
+                      <h4 class="home-title">Administrador de Proyectos</h4>
+                  </div>
+
+                  <!-- <div class="modal-header center-header">
+                      <img class="new-project-image" id="logo-nuevo-proyecto" onclick="$('#newProjectModal').modal();" src="app/resources/home/newProject.png" hspace="10"/>
+
+                      <button id="new-project-btn" onclick="$('#newProjectModal').modal();" class="btn btn-primary new-project-button" type="button">Nuevo Proyecto</button>
+                  </div> -->
+
+                  <div class="center-header user-header">
+                      Usuario:
+                      <input id="user-input" class="form-control user-input" type="text">
+                      <button class="my-button" onclick="onFSReady()">
+                          <img src="app/resources/home/enter.png">
+                      </button>
+                  </div>
+                  <div class="modal-header center-header">
+                      <button id="new-project-btn" onclick="$('#newProjectModal').modal();" class="btn btn-primary new-project-button" type="button">
+                          <img class="new-project-image" id="logo-nuevo-proyecto" src="app/resources/home/newProject.png" hspace="10"/>
+                          Nuevo Proyecto
+                      </button>
+                  </div>
+                  <div id="existing-projects" class="modal-body">
+                  </div>
+              </div>
+
+          </div>
+      </div>
+
+
+      <!-- New Project Modal -->
+      <div id="newProjectModal" class="modal fade" tabindex='-1'>
+          <div class="modal-dialog modal-sm">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h4 class="modal-title text-primary">Nombre del nuevo proyecto:</h4>
+                  </div>
+
+                  <div class="modal-body">
+                      <input id="inputName" class="form-control" type="text">
+                  </div>
+
+                  <div class="modal-header">
+                      <h4 class="modal-title text-primary">Descripción:</h4>
+                  </div>
+
+                  <div class="modal-body">
+                      <textarea id="project-description" rows="4" spellcheck="false" class="form-control"></textarea>
+                  </div>
+
+                  <div class="modal-header">
+                      <h4 class="modal-title text-primary">Categoría:</h4>
+                  </div>
+                  <div class="modal-body">
+                      <div id="labels" class="labels""></div>
+                  </div>
+                  <div class="modal-body">
+                      <div style="text-align:right">
+                          <span class="btn">
+                              <button onclick="createNewProject();" class="btn btn-primary" type="button">
+                                  <img class="new-project-image" src="app/resources/home/check.png" />
+                                  Aceptar
+                              </button>
+                          </span>
+                          <span class="btn">
+                              <button onclick="closeModal('newProjectModal');" class="btn btn-primary" type="button">
+                                  <img class="new-project-image" src="app/resources/home/close.png" />
+                                  Cancelar
+                              </button>
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Config Modal -->
+      <div id="configModal" class="modal fade" role="dialog" tabindex='-1'>
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h3 class="modal-title text-primary">Proyecto <label id="projectConfigName"></label></h3>
+                  </div>
+                  <div class="modal-header">
+                      <div class="inline">
+                          <h3 class="modal-title text-primary">Configuraciones</h3></div>
+                      <div class="inline pull-right">
+                          <img class="pull-right" src="app/resources/home/settings.png" hspace="10"/></div>
+                      <span class="clearBoth"></span>
+                  </div>
+                  <div class="modal-body">
+                      <b class="pull-left lmargin">Carpeta del proyecto</b> <br/>
+                      <div class="form-group">
+                          <div class="input-group input-file" style="width: 100%;">
+                              <input type="text" class="form-control path-input" id="ruta-proyecto" placeholder='C:/fakepath/' style='width: 100%;'/>
+                              <span class="input-group-btn">
+                                  <button style="visibility:hidden;"> </button>
+                              </span>
+                          </div>
+                          <br>
+                          <div id="valid-path"><p style="color:red;" align="center"></p></div>
+
+                      </div>
+                      <br/>
+                      <b class="pull-left lmargin">Resultados habilitados</b>
+                      <div class="material-switch pull-right">
+                          <input class="view-selector" id="results-on" type="checkbox">
+                          <label class="label-primary" for="results-on"></label>
+                      </div>
+                      <br/><br/>
+                      <b class="pull-left lmargin">Debug mode</b>
+                      <div class="material-switch pull-right">
+                          <input class="view-selector" id="debug-mode" type="checkbox">
+                          <label class="label-primary" for="debug-mode"></label>
+                      </div>
+                      <br/><br/>
+                      <button onclick="closeModal('configModal');" class="btn btn-primary pull-right" type="button">Cancelar</button>
+                      <button onclick="saveConfig();" class="btn btn-primary pull-right" type="button">Guardar</button>
+                      <br/><br/>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+      <!-- Remove Modal -->
+      <div id="removeModal" class="modal fade" role="dialog" tabindex='-1'>
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h3 class="modal-title text-primary">Proyecto <label id="projectRName"></label></h3>
+                  </div>
+                  <div class="modal-header">
+                      <h3 class="modal-title text-primary">¿Está seguro que desea eliminar el proyecto?</h3>
+                  </div>
+                  <div class="modal-body">
+                      <div>
+                          <br/>
+                          <div class="form-group">
+                              <div class="input-group input-file">
+                                  <span class="input-group-btn">
+-                                       <button class="btn btn-danger btn-choose"
+                                              onclick="removeAction(currentProjectName); closeModal('removeModal');"
+                                              type="button">Sí</button>
+                                      <button class="btn btn-info btn-choose" onclick="closeModal('removeModal');" type="button">No</button>
+-                                   </span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      </div> <!-- Container -->
+
+      <script type="text/javascript" src="app/lib/jquery-3.2.1.min.js"></script>
+      <script type="text/javascript" src="app/lib/bootstrap.min.js"></script>
+
+      <script type="text/javascript" src="app/js/loaders/filesystem.js"></script>
+      <script type="text/javascript" src="app/js/utils.js"></script>
+
+      <script type="text/javascript" src="app/js/gui/home.js"></script>
+  </body>
+
 </html>
+

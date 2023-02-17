@@ -23,25 +23,6 @@ function fsErrorHandler(e) {
 fileSystem.createFolder = function(folder,name,afterCreation){
 	folder.getDirectory(name,{exclusive:true,create:true},afterCreation,fsErrorHandler);
 };
-
-/**
-* Metodo que accede una carpeta en la FolderEntry folder con el nombre name.
-* Luego llama afterCreation pasandole el FolderEntry.
-*/
-fileSystem.getFolder = function(folder,name,handler){
-	console.log("pasando por getFolder");
-	folder.getDirectory(name,{exclusive:true},handler,fsErrorHandler);
-};
-
-/**
-* Metodo que elimina una carpeta o un archivo.
-*/
-fileSystem.remove = function(entry,onRemove){
-	if(entry.isFile)
-		entry.remove(onRemove,fsErrorHandler);
-	else if(entry.isDirectory)
-		entry.removeRecursively(onRemove,fsErrorHandler);
-};
 /**
 * Metodo que cra un archivo en el FolderEntry folder con el nombre name y tras crearla llama afterCreation pasandole el FileEntry.
 */
@@ -49,31 +30,6 @@ fileSystem.createFile = function(folder,name,afterCreation){
 	folder.getFile(name,{exclusive:true,create:true},afterCreation,fsErrorHandler);
 };
 
-/**
-* Metodo que accede un archivo en la FolderEntry folder con el nombre name.
-* Luego llama afterCreation pasandole el FileEntry.
-*/
-fileSystem.getFile = function(folder,name,handler){
-	console.log("pasando por getFile");
-	folder.getFile(name,{exclusive:true},handler,fsErrorHandler);
-};
-
-
-
-/**
-* Metodo que revisa el espacio usado y total y llama afterCheck pasandole el objeto {used: , total: , free: }
-*/
-fileSystem.checkSpace = function(afterCheck){
-	navigator.webkitPersistentStorage.queryUsageAndQuota((used,total) => 
-		afterCheck({used: used,total: total,free:total-used}));
-};
-
-/**
-* Metodo que llama filesHandler pasandole como argumento la lista de elementos contenidos en la carpeta representada por la FolderEntry folder.
-*/
-fileSystem.ls = function(folder,filesHandler){
-	return folder.createReader().readEntries(filesHandler);
-};
 
 /**
 * Metodo que escribe en el FileEntry entregado. Entries tiene que ser transformable a blob o un arreglo de
@@ -99,6 +55,54 @@ fileSystem.writeToFile = function(writableFileEntry,entries,afterWrite) {
 };
 
 /**
+* Metodo que accede un archivo en la FolderEntry folder con el nombre name.
+* Luego llama afterCreation pasandole el FileEntry.
+*/
+fileSystem.getFile = function(folder,name,handler){
+	console.log("pasando por getFile");
+	folder.getFile(name,{exclusive:true},handler,fsErrorHandler);
+};
+
+
+/**
+* Metodo que accede una carpeta en la FolderEntry folder con el nombre name.
+* Luego llama afterCreation pasandole el FolderEntry.
+*/
+fileSystem.getFolder = function(folder,name,handler){
+	console.log("pasando por getFolder");
+	folder.getDirectory(name,{exclusive:true},handler,fsErrorHandler);
+};
+
+/**
+* Metodo que elimina una carpeta o un archivo.
+*/
+fileSystem.remove = function(entry,onRemove){
+	if(entry.isFile)
+		entry.remove(onRemove,fsErrorHandler);
+	else if(entry.isDirectory)
+		entry.removeRecursively(onRemove,fsErrorHandler);
+};
+
+
+/**
+* Metodo que revisa el espacio usado y total y llama afterCheck pasandole el objeto {used: , total: , free: }
+*/
+fileSystem.checkSpace = function(afterCheck){
+	navigator.webkitPersistentStorage.queryUsageAndQuota((used,total) => 
+		afterCheck({used: used,total: total,free:total-used}));
+};
+
+
+/**
+* Metodo que llama filesHandler pasandole como argumento la lista de elementos contenidos en la carpeta representada por la FolderEntry folder.
+*/
+fileSystem.ls = function(folder,filesHandler){
+	return folder.createReader().readEntries(filesHandler);
+};
+
+
+
+/**
 * Metodo que lee el FileEntry entregado, lo convierte a string y llama a afterRead entregandole
 * el resultado de la lectura como parametro
 */
@@ -119,6 +123,7 @@ fileSystem.readFromFile = function(readableFileEntry,afterRead) {
 * Metodo llamado al inicializar el filesystem
 */
 function onInitFs (fs) {
+	console.log("pasando por onInitFs");
 	//Guardo el filesystem y la carpeta root
 	fileSystem.fs = fs;
 	fileSystem.root = fs.root;
@@ -176,18 +181,47 @@ function onInitFs (fs) {
 * Reviso el espacio disponible. Si es 0 pido memoria, de lo contrario simplemente abro el fileSystem.
 */
 
-fileSystem.checkSpace(
-	(result) => {
-		let initfs = (bytes) => window.requestFileSystem(PERSISTENT, bytes, onInitFs, fsErrorHandler);
-		if(result.total === 0){
-			console.log("Hola")
-			navigator.webkitPersistentStorage.requestQuota(10*1024*1024*1024, function(grantedBytes) {
-				console.log("Se acaba de crear un sistema de archivo de",grantedBytes/(1024*1024)/1024.0,"GB");
-				initfs(grantedBytes);
-			}, fsErrorHandler);
+const requestQuota = (bytes) => {
+	return new Promise((resolve, reject) => {
+	  navigator.webkitPersistentStorage.requestQuota(bytes, resolve, reject);
+	});
+  };
+  
+  const checkSpace = () => {
+	return new Promise((resolve, reject) => {
+	  navigator.webkitPersistentStorage.queryUsageAndQuota((usedBytes, grantedBytes) => {
+		if (grantedBytes === 0) {
+		  reject(new Error("No se pudo obtener el espacio de almacenamiento"));
 		} else {
-			console.log("Sistema de archivos ya existe con capacidad de",(result.total)/(1024*1024)/1024.,"GB");
-			initfs(result.total+result.used);
+		  resolve({ used: usedBytes, total: grantedBytes });
 		}
+	  }, reject);
+	});
+  };
+  
+  checkSpace().then((result) => {
+	let initfs = (bytes) =>
+	  window.requestFileSystem(PERSISTENT, bytes, onInitFs, fsErrorHandler);
+	if (result.total === 0) {
+	  requestQuota(10 * 1024 * 1024 * 1024)
+		.then((grantedBytes) => {
+		  console.log(
+			"Se acaba de crear un sistema de archivo de",
+			grantedBytes / (1024 * 1024) / 1024.0,
+			"GB"
+		  );
+		  initfs(grantedBytes);
+		})
+		.catch(fsErrorHandler);
+	} else {
+	  console.log(
+		"Sistema de archivos ya existe con capacidad de",
+		result.total / (1024 * 1024) / 1024.,
+		"GB"
+	  );
+	  initfs(result.total + result.used);
 	}
-);
+  }).catch(fsErrorHandler);
+  
+
+

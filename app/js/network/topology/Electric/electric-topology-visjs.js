@@ -16,21 +16,47 @@ var electricMapTopology = {
   centrals: []
 };
 
-function loadElectricTopology(buses, lines, centrals){
+// function loadElectricTopology(buses, lines, centrals){
+//   console.log("pasando por loadElectricTopology");
+//   // console.log("hidrotimes 0: ",hydrologyTimes)
+//   // Parseamos las variables recibidas.
+//   let t0 = performance.now();
+//   console.log("----------------------------------------------------------------")
+//   parseBuses(buses, electricTopology, TOPOLOGY_TYPES.ELECTRIC);
+//   let t1 = performance.now();
+//   console.log("parseBuses electrictopology tardó " + (t1-t0) + " milisegundos.")
+//   console.log("----------------------------------------------------------------")
+//   parseBuses(buses, electricMapTopology, TOPOLOGY_TYPES.GEO);
+//   let t2 = performance.now();
+//   console.log("parseBuses geoTopology tardó " + (t2-t1) + " milisegundos.")
+//   parseLines(lines, electricTopology);
+//   let t3=performance.now()
+//   parseCentrals(centrals, electricTopology, TOPOLOGY_TYPES.ELECTRIC);
+//   let t4 = performance.now();
+//   console.log("parseCentrals electricTopology tardó " + (t4-t3) + " milisegundos.")
+//   parseCentrals(centrals, electricMapTopology, TOPOLOGY_TYPES.GEO);
+//   let t5 = performance.now();
+//   console.log("parseCentrals geoTopology tardó " + (t5-t4) + " milisegundos.")
+//   console.log("loadElectricTopology tardó " + (t5 - t0) + " milisegundos.")
+
+// }
+
+async function loadElectricTopology(buses, lines, centrals){
   console.log("pasando por loadElectricTopology");
   // console.log("hidrotimes 0: ",hydrologyTimes)
   // Parseamos las variables recibidas.
   let t0 = performance.now();
   console.log("----------------------------------------------------------------")
-  parseBuses(buses, electricTopology, TOPOLOGY_TYPES.ELECTRIC);
+  await parseBuses(buses, electricTopology, TOPOLOGY_TYPES.ELECTRIC);
   let t1 = performance.now();
   console.log("parseBuses electrictopology tardó " + (t1-t0) + " milisegundos.")
   console.log("----------------------------------------------------------------")
-  parseBuses(buses, electricMapTopology, TOPOLOGY_TYPES.GEO);
+  await parseBuses(buses, electricMapTopology, TOPOLOGY_TYPES.GEO);
   let t2 = performance.now();
   console.log("parseBuses geoTopology tardó " + (t2-t1) + " milisegundos.")
   parseLines(lines, electricTopology);
   let t3=performance.now()
+  console.log("parseLines electricTopology tardó " + (t3-t2) + " milisegundos.")
   parseCentrals(centrals, electricTopology, TOPOLOGY_TYPES.ELECTRIC);
   let t4 = performance.now();
   console.log("parseCentrals electricTopology tardó " + (t4-t3) + " milisegundos.")

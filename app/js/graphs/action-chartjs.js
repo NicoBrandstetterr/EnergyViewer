@@ -386,7 +386,6 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
     }
   }
   requestindhor.send();
-  console.log("indhor: ",indhor);
   if (elementObject.category === "bus-to-bus"){
     console.log("Percentil Lineas");
     // console.log("Mostrando objeto",elementObject);
@@ -808,8 +807,6 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
     }
   }
 
-
-
 /**
  * Setea los datos necesarios para que se grafiquen los flujos hacia una barra dada una hidrología.
  * @param edges aristas del grafo actual
@@ -1079,6 +1076,7 @@ function changeChartNumberOfColumns() {
 }
 
 $(() => {
+  // selecciona el elemento HTML con un id de "charts" y lo asigna a una variable llamada "charts".
   var charts = $("#charts")
   // Hace editable la lista de graficos
   var SortableList = charts.sortable( {

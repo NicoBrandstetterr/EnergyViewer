@@ -3,99 +3,62 @@
 var buses = [];
 var lines = [];
 var generators = [];
-
-/* Cargamos los datos de las lineas, barras y generadores. */
-var bReq = new XMLHttpRequest();
-var lReq = new XMLHttpRequest();
-var gReq = new XMLHttpRequest();
-
 var busInfo;
 
-gReq.onreadystatechange = function () {
-  
-  if (this.readyState === 4) {
-    console.log("pasando por gReq.onreadystatechange")
-    let t0 = performance.now();
-    generators = JSON.parse(this.responseText);
-	  createLog('Archivo de generadores leído', LOG_TYPE.SUCCESS)
-    console.log("pasando por gReq.onreadystatechange")
-
-    let t1 = performance.now();
-    // console.log("generators = JSON.parse(this.responseText); tardó " + (t1 - t0) + " milisegundos.")
-    loadElectricTopology(buses, lines, generators);
-    let t2 = performance.now();
-    console.log("loadElectricTopology tardó " + (t2 - t1) + " milisegundos.")
+async function loadElectricData() {
+  try {
+    const [bResponse, lResponse, gResponse] = await Promise.all([
+      fetch(CONFIG.URL_BUSES),
+      fetch(CONFIG.URL_LINES),
+      fetch(CONFIG.URL_CENTRALS)
+    ]);
+    
+    if (!bResponse.ok) {
+      createLog("No está el archivo de buses (buses.json)", LOG_TYPE.ERROR);
+      return;
+    }
+    if (!lResponse.ok) {
+      createLog("No está el archivo de líneas (lines.json)", LOG_TYPE.ERROR);
+      return;
+    }
+    if (!gResponse.ok) {
+      createLog("No está el archivo de generadores (centrals.json)", LOG_TYPE.ERROR);
+      return;
+    }
+    
+    const [buses, lines, generators] = await Promise.all([
+      bResponse.json(),
+      lResponse.json(),
+      gResponse.json()
+    ]);
+    
+    createLog('Archivo de buses leído', LOG_TYPE.SUCCESS);
+    createLog('Archivo de líneas leído', LOG_TYPE.SUCCESS);
+    createLog('Archivo de generadores leído', LOG_TYPE.SUCCESS);
+    
+    if(!CONFIG.RESULTS_DISABLED) await loadLinesFiles();
+    
+    await loadElectricTopology(buses, lines, generators);
     parseElectricTopologyToNetwork();
-    let t3 = performance.now();
-    console.log("parseElectricTopologyToNetwork tardó " + (t3 - t2) + " milisegundos.")
     addDataToMapNetwork();
-    let t4 = performance.now();
-    console.log("addDataToMapNetwork tardó " + (t4 - t3) + " milisegundos.")
-    console.log("Se viene creacion red electrica")
-    var result = generateNetwork(electricContainer, nodesArray, edgesArray, TOPOLOGY_TYPES.ELECTRIC);
-	  createLog('Red eléctrica generada correctamente!', LOG_TYPE.SUCCESS)
+    const result = generateNetwork(electricContainer, nodesArray, edgesArray, TOPOLOGY_TYPES.ELECTRIC);
+    createLog('Red eléctrica generada correctamente!', LOG_TYPE.SUCCESS);
     electricNetwork = result.network;
     electricNodes = result.nodes;
     electricEdges = result.edges;
-    console.log("se viene creacion de vista georeferenciada")
-    //testFunction(geoContainer, nodesMArray, edgesMArray);
     geoNetwork = generateLLNetwork(geoContainer, nodesMArray);
-    // var resultMap = generateNetwork(geoContainer, nodesMArray, edgesMArray, TOPOLOGY_TYPES.GEO);
-	  // createLog('Vista georeferenciada generada correctamente!', LOG_TYPE.SUCCESS)
-    // geoNetwork = resultMap.network;
-    // geoNodes = resultMap.nodes;
-    // geoEdges = resultMap.edges;
-    // enableDrag(geoNetwork, $('#my-geo-network'), geoNodes);
     toElectricView();
     enableDrag(electricNetwork, $('#my-electric-network'), electricNodes);
-    let t5 = performance.now();
-    // console.log("final de greq tardó " + (t5-t4) + " milisegundos.")
-    console.log("total de greq tardó " + (t5-t0) + " milisegundos.")
+  } catch (error) {
+    console.error(error);
   }
-};
+}
 
-lReq.onreadystatechange = function () {
-  
-  if (this.readyState === 4) {
-    let t0 = performance.now();
-    console.log("pasando por lReq.onreadystatechange")
-    lines = JSON.parse(this.responseText);
-    console.log("Tiempo de carga lines parse:" + (performance.now()-t0) + " milisegundos.");
-    if(!CONFIG.RESULTS_DISABLED) loadLinesFiles();
-    createLog('Archivo de líneas leído', LOG_TYPE.SUCCESS);
-    console.log("Tiempo de carga lines topology:" + (performance.now()-t0) + " milisegundos.");
-    gReq.open("GET", CONFIG.URL_CENTRALS, false);
-    gReq.send();
-    let t1 = performance.now();
-    console.log("final de lreq tardó " + (t1-t0) + " milisegundos.")
-  }
-};
+loadElectricData();
 
-bReq.onreadystatechange = function () {
-  
-  if (this.readyState === 4) {
-    // console.log("hidrotimes -1: ",hydrologyTimes)
-    console.log("pasando por bReq.onreadystatechange")
-    // console.log(process.versions.v8)
-    // console.log("version: ",process.versions.node)
-    let t0 = performance.now();
-    buses = JSON.parse(this.responseText);
-	  createLog('Archivo de barras leído', LOG_TYPE.SUCCESS)
-    let t1 = performance.now();
-    // console.log("El código breq 1 tardó " + (t1 - t0) + " milisegundos.")
-    lReq.open("GET", CONFIG.URL_LINES, false);
-    lReq.send();
-    let t2 = performance.now();
-    // console.log("El código breq 2 tardó " + (t2 - t1) + " milisegundos.")
-    console.log("final de breq  tardó " + (t2 - t0) + " milisegundos.")
-  }
-  
-};
-
-bReq.open("GET", CONFIG.URL_BUSES, false);
-bReq.send();
 
 function loadFile() {
+  console.log("pasando por loadFile");
   var input, file, fr;
 
   if (typeof window.FileReader !== 'function') {

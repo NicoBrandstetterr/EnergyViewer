@@ -8,6 +8,8 @@ var BASE_FOLDER_NAME = getParameterByName("base_uri");//base_cfg.BASE_FOLDER_NAM
 // var BASE_FOLDER_NAME = "file:///C:/Users/user/Documents/data/";
 var MODEL_FOLDER_NAME = getParameterByName("model");
 
+
+// "ENABLE_TIME_LOG"       :   (getParameterByName('debug') === 'true')
 let base_cfg = {
     "BASE_FOLDER_NAME"      :  BASE_FOLDER_NAME,
     "MODEL_FOLDER_NAME"     :  MODEL_FOLDER_NAME,

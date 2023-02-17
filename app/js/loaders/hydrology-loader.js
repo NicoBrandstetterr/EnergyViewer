@@ -7,57 +7,64 @@
 
 
 let hydrologyTimes = {};
-loadHydrologies();
+console.log(window.location.href);
+
 
 /**
  * Carga la lista de hidrologías disponibles.
  */
-function loadHydrologies(){
-
-  let hReq = new XMLHttpRequest();
-
-  // Función que se ejecuta al cargar el archivo de las hidrologías.
-  let onLoad = function (req) {
-    return function() {
-      if (req.readyState === 4) {
-        hydrologyList = JSON.parse(req.responseText); // guarda la lista
-        if (hydrologyList.length > 0) {
-          chosenHydrology = hydrologyList[0];
-          CONFIG.BUSES_FOLDER = CONFIG.BUSES_FOLDER.formatUnicorn({hydrology:chosenHydrology});
-          CONFIG.CENTRALS_FOLDER = CONFIG.CENTRALS_FOLDER.formatUnicorn({hydrology:chosenHydrology});
-          CONFIG.LINES_FOLDER = CONFIG.LINES_FOLDER.formatUnicorn({hydrology:chosenHydrology});
-          CONFIG.RESERVOIRS_FOLDER = CONFIG.RESERVOIRS_FOLDER.formatUnicorn({hydrology:chosenHydrology});
-          if(!CONFIG.RESULTS_DISABLED) loadLinesFiles();
-          buildDropdownHydrology();
-        } else {
-          createLog('El archivo de hidrologías no tiene datos.', LOG_TYPE.ERROR);
-        }
-      }
-    }
-  };
-
-  hReq.onreadystatechange = onLoad(hReq);
-  try {
-    hReq.open("GET", CONFIG.URL_HYDROLOGIES, false);
-    hReq.send();
-  } catch (err){
-    createLog('No esta el archivo de hidrologías.', LOG_TYPE.ERROR);
-  }
-}
 
 
-let tReq = new XMLHttpRequest();
-tReq.onreadystatechange = function () {
-  if (this.readyState === 4) {
-    let line = JSON.parse(this.responseText);
-    if (line.length > 1) {
-      hydrologyTimes[chosenHydrology].lines[line[0].id] = line;
+// function loadHydrologies(){
+//   console.log("pasando por loadHydrologies");
+//   let hReq = new XMLHttpRequest();
 
-    } else {
-      console.log("Linea no tiene archivo de resultados.");
-    }
-  }
-};
+//   // Función que se ejecuta al cargar el archivo de las hidrologías.
+//   let onLoad = function (req) {
+//     return function() {
+//       if (req.readyState === 4) {
+//         hydrologyList = JSON.parse(req.responseText); // guarda la lista
+//         if (hydrologyList.length > 0) {
+//           chosenHydrology = hydrologyList[0];
+//           CONFIG.BUSES_FOLDER = CONFIG.BUSES_FOLDER.formatUnicorn({hydrology:chosenHydrology});
+//           CONFIG.CENTRALS_FOLDER = CONFIG.CENTRALS_FOLDER.formatUnicorn({hydrology:chosenHydrology});
+//           CONFIG.LINES_FOLDER = CONFIG.LINES_FOLDER.formatUnicorn({hydrology:chosenHydrology});
+//           CONFIG.RESERVOIRS_FOLDER = CONFIG.RESERVOIRS_FOLDER.formatUnicorn({hydrology:chosenHydrology});
+//           if(!CONFIG.RESULTS_DISABLED) loadLinesFiles();
+//           buildDropdownHydrology();
+//         } else {
+//           createLog('El archivo de hidrologías no tiene datos.', LOG_TYPE.ERROR);
+//         }
+//       }
+//     }
+//   };
+
+//   hReq.onreadystatechange = onLoad(hReq);
+//   try {
+//     hReq.open("GET", CONFIG.URL_HYDROLOGIES, false);
+//     hReq.send();
+//   } catch (err){
+//     createLog('No esta el archivo de hidrologías.', LOG_TYPE.ERROR);
+//   }
+// }
+
+
+// let tReq = new XMLHttpRequest();
+// tReq.onreadystatechange = function () {
+//   if (this.readyState === 4) {
+//     let line = JSON.parse(this.responseText);
+//     if (line.length > 1) {
+//       hydrologyTimes[chosenHydrology].lines[line[0].id] = line;
+
+//     } else {
+//       console.log("Linea no tiene archivo de resultados.");
+//     }
+//   }
+// };
+
+
+
+
 
 /**
  * Función que carga todos los archivos de resultado de las líneas de la actual hidrología.
@@ -75,39 +82,106 @@ tReq.onreadystatechange = function () {
 //   }
 // }
 
+// async function loadLinesFiles(){
+//   console.log("pasando por loadlinesfiles")
+//   if(typeof lines === 'undefined') return;
+
+//   // Esto solo revisa si la estructura fue creada.
+//   checkHydrologyTimes(chosenHydrology);
+
+//   let noLineResultsLog = [];
+  
+//   for (let i = 0; i < lines.length; i++) {
+//       let lineID = lines[i].id;
+
+//       if (!(lineID in hydrologyTimes[chosenHydrology].lines)) {
+//         try {
+//           let response = await fetch(getUrlByHydrology('lines', chosenHydrology) + getTypeToFileString('lines') + lineID + ".json");
+//           if (response.ok) {
+//             let lineData = await response.json();
+//             hydrologyTimes[chosenHydrology].lines[lineID] = lineData;
+//           }
+//           else {
+//             if (noLineResultsLog.length === 0) {
+//               noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
+//             }
+//             addDetailsToLog(noLineResultsLog[0], "Línea ID: "+lineID);
+//           }
+//         } catch (err) {
+//           if (noLineResultsLog.length === 0) {
+//             noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
+//           }
+//           addDetailsToLog(noLineResultsLog[0], "Línea ID: "+lineID);
+//         }
+//       }
+//   }
+// }
+
 async function loadLinesFiles(){
+  console.log("pasando por loadlinesfiles")
   if(typeof lines === 'undefined') return;
 
   // Esto solo revisa si la estructura fue creada.
   checkHydrologyTimes(chosenHydrology);
 
   let noLineResultsLog = [];
+  let promises = [];
   
   for (let i = 0; i < lines.length; i++) {
       let lineID = lines[i].id;
 
       if (!(lineID in hydrologyTimes[chosenHydrology].lines)) {
-        try {
-          let response = await fetch(getUrlByHydrology('lines', chosenHydrology) + getTypeToFileString('lines') + lineID + ".json");
-          if (response.ok) {
-            let lineData = await response.json();
-            hydrologyTimes[chosenHydrology].lines[lineID] = lineData;
-          } else {
-            if (noLineResultsLog.length === 0) {
-              noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
+        promises.push(
+          (async () => {
+            try {
+              let response = await fetch(getUrlByHydrology('lines', chosenHydrology) + getTypeToFileString('lines') + lineID + ".json");
+              if (response.ok) {
+                let lineData = await response.json();
+                hydrologyTimes[chosenHydrology].lines[lineID] = lineData;
+              } else {
+                if (noLineResultsLog.length === 0) {
+                  noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
+                }
+                addDetailsToLog(noLineResultsLog[0], "Línea ID: "+lineID);
+              }
+            } catch (err) {
+              if (noLineResultsLog.length === 0) {
+                noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
+              }
+              addDetailsToLog(noLineResultsLog[0], "Línea ID: "+lineID);
             }
-            addDetailsToLog(noLineResultsLog[0], "Línea ID: "+lineID);
-          }
-        } catch (err) {
-          if (noLineResultsLog.length === 0) {
-            noLineResultsLog.push(createLog('Hay líneas sin archivo de resultados', LOG_TYPE.ERROR));
-          }
-          addDetailsToLog(noLineResultsLog[0], "Línea ID: "+lineID);
-        }
+          })()
+        );
       }
   }
+
+  await Promise.all(promises);
 }
 
+async function loadHydrologies(){
+  console.log("pasando por loadHydrologies");
+  
+  try {
+    const response = await fetch(CONFIG.URL_HYDROLOGIES);
+    hydrologyList = await response.json();
+    if (hydrologyList.length > 0) {
+      chosenHydrology = hydrologyList[0];
+      CONFIG.BUSES_FOLDER = CONFIG.BUSES_FOLDER.formatUnicorn({hydrology:chosenHydrology});
+      CONFIG.CENTRALS_FOLDER = CONFIG.CENTRALS_FOLDER.formatUnicorn({hydrology:chosenHydrology});
+      CONFIG.LINES_FOLDER = CONFIG.LINES_FOLDER.formatUnicorn({hydrology:chosenHydrology});
+      CONFIG.RESERVOIRS_FOLDER = CONFIG.RESERVOIRS_FOLDER.formatUnicorn({hydrology:chosenHydrology});
+      if(!CONFIG.RESULTS_DISABLED){
+        await loadLinesFiles();
+      }
+      buildDropdownHydrology();
+    } else {
+      createLog('El archivo de hidrologías no tiene datos.', LOG_TYPE.ERROR);
+    }
+  } catch (err) {
+    createLog('No esta el archivo de hidrologías.', LOG_TYPE.ERROR);
+  }
+}
+loadHydrologies();
 
 /**
  * Carga el resultado de la línea si es necesario. Guarda en la estructura hydrologyTimes los resultados
@@ -162,7 +236,32 @@ async function loadLinesFiles(){
  * @param hydro
  *
  */
-function loadBusFile(busId, noLoadAction , loadAction, hydro) {
+// function loadBusFile(busId, noLoadAction , loadAction, hydro) {
+  
+//   if(typeof hydro === 'undefined') hydro = chosenHydrology;
+
+//   // Verifica si esta la estructura de datos necesaria.
+//   checkHydrologyTimes(hydro);
+
+//   // verifico si los resultado ya fueron cargados.
+//   if(busId in hydrologyTimes[hydro].buses) {
+//     console.log("preload loadbusfile");
+//     noLoadAction(hydrologyTimes[hydro].buses[busId]);
+//   } else {
+//     // cargo los datos que no fueron cargados previamente.
+//     console.log("callback loadbusfile");
+//     let chartReq = new XMLHttpRequest();
+//     chartReq.onreadystatechange = loadAction(chartReq, hydro,busId);
+//     try {
+//       chartReq.open("GET", getUrlByHydrology('buses', hydro) + getTypeToFileString('buses') + busId + ".json", false);
+//       chartReq.send();
+//     } catch (err) {
+//       createLog('El archivo de resultados de la barra ' + busId + " no existe", LOG_TYPE.ERROR);
+//     }
+//   }
+// }
+
+async function loadBusFile(busId, noLoadAction , hydro) {
   if(typeof hydro === 'undefined') hydro = chosenHydrology;
 
   // Verifica si esta la estructura de datos necesaria.
@@ -174,12 +273,22 @@ function loadBusFile(busId, noLoadAction , loadAction, hydro) {
     noLoadAction(hydrologyTimes[hydro].buses[busId]);
   } else {
     // cargo los datos que no fueron cargados previamente.
-    console.log("callback loadbusfile");
-    let chartReq = new XMLHttpRequest();
-    chartReq.onreadystatechange = loadAction(chartReq, hydro,busId);
+    console.log("primer callback");
     try {
-      chartReq.open("GET", getUrlByHydrology('buses', hydro) + getTypeToFileString('buses') + busId + ".json", false);
-      chartReq.send();
+      
+      const response = await fetch(getUrlByHydrology('buses', hydro) + getTypeToFileString('buses') + busId + ".json");
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const busData = await response.json();
+      // console.log("callback loadbusfile");
+      if(!(busId in hydrologyTimes[chosenHydrology]['buses'])) {
+        
+        hydrologyTimes[chosenHydrology]['buses'][busId] = busData;
+      }
+      noLoadAction(hydrologyTimes[hydro].buses[busId]);
+
     } catch (err) {
       createLog('El archivo de resultados de la barra ' + busId + " no existe", LOG_TYPE.ERROR);
     }
@@ -291,3 +400,4 @@ function checkHydrologyTimes(hydro){
     };
   }
 }
+

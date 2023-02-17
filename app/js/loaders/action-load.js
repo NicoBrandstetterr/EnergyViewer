@@ -23,7 +23,7 @@ function showFiles(){
 /**
  * Actualiza los datos en el network (grafo) según la hidrología elegida en el select.
  */
-function updateHydrology() {
+async function updateHydrology() {
   console.log("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
   console.log("Pasando por UpdateHydrology")
   let t0 = performance.now();
@@ -40,7 +40,7 @@ function updateHydrology() {
   // Cargamos los archivos necesarios
   let t1 = performance.now();
   console.log("updateHydrology chosenHydrology = parseInt(select.options[select.selectedIndex].value); tardó " + (t1-t0) + " milisegundos.")
-  loadLinesFiles();
+  await loadLinesFiles();
   let t2 = performance.now();
   console.log("updateHydrology loadLinesFiles tardó " + (t2-t1) + " milisegundos.")
   
@@ -51,7 +51,7 @@ function updateHydrology() {
   console.log("updateHydrology updateLines tardó " + (t3-t2) + " milisegundos.")
 
   // console.log("hidrotimes 3: ",hydrologyTimes)
-  updateBuses(currentNodes);
+  await updateBuses(currentNodes);
   let t4 = performance.now();
   console.log("updateHydrology updateBuses tardó " + (t4-t3) + " milisegundos.")
   // console.log("hidrotimes 4: ",hydrologyTimes)
@@ -65,7 +65,6 @@ function updateHydrology() {
   changeConfigHydrology();
 
   let t6 = performance.now();
-  console.log("updateHydrology changeConfigHydrology tardó " + (t6-t5) + " milisegundos.")
   console.log("updateHydrology En TOTAL tardó " + (t6-t0) + " milisegundos.")
   console.log("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
 }

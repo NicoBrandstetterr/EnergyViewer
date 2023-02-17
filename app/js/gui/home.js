@@ -84,7 +84,7 @@ function verWinPath(simplePath){
  * @param category Nombre de la categoría del proyecto como string
  */
 
-function addProjectRow(fileName, category, description){
+function addProjectRow(fileName, category, description,aux=false){
   let category_index = CATEGORIES.indexOf(category);
   let category_container;
   let projects_div;
@@ -98,8 +98,8 @@ function addProjectRow(fileName, category, description){
   }
 
   category_container.css("display", "block");
-
-  projects_div.append(("<div class='project-container' id='{name}'>" + 
+  if (aux){
+    projects_div.append(("<div class='project-container' id='{name}'>" + 
     "<hr class='hr-primary' style='color: white; width: 100%'/>" +
     "<table style='width:100%'><tr>" +
     "<td><label class='project-name'>{name}</label></td>" +
@@ -108,11 +108,31 @@ function addProjectRow(fileName, category, description){
     "<div class='buttons-container'>" +
     "<img class=\"new-project-image pull-right\" onclick=\"openConfiguration('{name}')\" id=\"settings\" src=\"resources/home/settings.png\" />" +
     "<img class=\"new-project-image pull-right\" onclick=\"openRemove('{name}')\" id=\"minus\" src=\"resources/home/minus.png\" />" +
-    "<img class=\"new-project-image pull-right\" onclick=\"startProject('{name}')\" id=\"plus\" src=\"resources/home/start.png\" />" +
+    "<img class=\"new-project-image pull-right\" onclick=\"startProjectAuto('{name}')\" id=\"plus\" src=\"resources/home/start.png\" />" +
     "</div>" +
     "</td>" +
     "</tr></table>" +
     "</div>").formatUnicorn({ name: fileName, desc: description }));
+  }
+
+  else{
+    projects_div.append(("<div class='project-container' id='{name}'>" + 
+        "<hr class='hr-primary' style='color: white; width: 100%'/>" +
+        "<table style='width:100%'><tr>" +
+        "<td><label class='project-name'>{name}</label></td>" +
+        "<td style='width: 60%; text-align: justify; text-justify: inter-word'><div>{desc}</div></td>" +
+        "<td style='width: 120px'>" +
+        "<div class='buttons-container'>" +
+        "<img class=\"new-project-image pull-right\" onclick=\"openConfiguration('{name}')\" id=\"settings\" src=\"resources/home/settings.png\" />" +
+        "<img class=\"new-project-image pull-right\" onclick=\"openRemove('{name}')\" id=\"minus\" src=\"resources/home/minus.png\" />" +
+        "<img class=\"new-project-image pull-right\" onclick=\"startProject('{name}')\" id=\"plus\" src=\"resources/home/start.png\" />" +
+        "</div>" +
+        "</td>" +
+        "</tr></table>" +
+        "</div>").formatUnicorn({ name: fileName, desc: description }));
+
+  }
+  
 }
 
 /**
@@ -120,10 +140,12 @@ function addProjectRow(fileName, category, description){
  * @param fileName Nombre del proyecto en una variable de tipo string
  */
 function readProperties(fileName) {
+  console.log("´pasando por readProperties");
   fileSystem.getFolder(fileSystem.projects, fileName, project =>
     fileSystem.getFile(project, "config.json", configFile =>
       fileSystem.readFromFile(configFile, text => {
         currentJsonProject = JSON.parse(text);
+
         let category = currentJsonProject.CATEGORY;
         let user_name = currentJsonProject.USER;
         let description = currentJsonProject.DESCRIPTION;
@@ -137,23 +159,33 @@ function readProperties(fileName) {
 /**
  * Carga la lista de proyectos una vez que el modulo de filesystem este cargado.
  */
+
 function onFSReady() {
+  console.log("pasando por onFSready")
   let projectsDiv = $("#existing-projects");
   projectsDiv.empty();
-  // fetch("./json/categories.json")
-  //   .then(response => response.json())
-  //   .then(json => categories_setup(json));
+  
   categories_setup(CATEGORIES);
-  console.log(fileSystem)
-  fileSystem.ls(fileSystem.projects, arr => {
-    arr.sort((f1,f2) => f1.name.localeCompare(f2.name));
-    arr.map(file => {
-      if(!file.isDirectory) return;
-      let varr;
-      readProperties(file.name, varr);
+
+
+  if (fileSystem.projects && typeof fileSystem.projects === "object") {
+    fileSystem.ls(fileSystem.projects, (entries, error) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      entries.sort((f1, f2) => f1.name.localeCompare(f2.name));
+      entries.forEach(entry => {
+        if (entry.isDirectory) {
+          readProperties(entry.name);
+        }
+      });
     });
-  });
+  } else {
+    console.error("fileSystem.projects is not defined or is not an object");
+  }
 }
+
 
 /**
  * Elimina el proyecto seleccionado.
@@ -167,7 +199,7 @@ function removeAction(name){
 
 function removeRow(){
   $("#{project}".formatUnicorn({project: currentProjectName})).remove();
-  //console.log($("#{project}".formatUnicorn({project: currentProjectName})));
+
 }
 
 /**
@@ -180,7 +212,9 @@ function openConfiguration(name){
   fileSystem.getFolder(fileSystem.projects, name, project =>
       fileSystem.getFile(project, "config.json", configFile =>
         fileSystem.readFromFile(configFile, text => {
+
               currentJsonProject = JSON.parse(text);
+              
               $('#results-on').prop('checked', !currentJsonProject.RESULTS_DISABLED);
               //$('#generadores-agregados').prop('checked', currentJsonProject.AGGREGATE_GENERATORS_ENABLED);
               $('#debug-mode').prop('checked', currentJsonProject.ENABLE_TIME_LOG);
@@ -240,7 +274,7 @@ function startProject(name){
 function saveConfig(){
 
   var rutaProyecto = $("#ruta-proyecto").val();
-  //console.log(verifyPathAccordingToOS(rutaProyecto));
+
   if(rutaProyecto!=="" && verifyPathAccordingToOS(rutaProyecto) ){
       savePath(rutaProyecto, 'proyecto');
 
@@ -268,6 +302,7 @@ function savePath(path) {
       baseIdx = path.substring(0, baseIdx - 1).lastIndexOf("/");
       modelIdx = path.length - 1;
   }
+  
   currentJsonProject.BASE_FOLDER_NAME = path.substring(0, baseIdx + 1); // Path sin nombre del modelo, pero con el "/" final
   currentJsonProject.MODEL_FOLDER_NAME = path.substring(baseIdx + 1, modelIdx); // Modelo (Ej. "CHL")
 }
@@ -286,15 +321,12 @@ function closeModal(modalID) {
 function createNewProject() {
   // Apretando la tecla enter.
 
-  var project = $('#inputName').val();
+  let project = $('#inputName').val();
 
   let name = $("#user-input")[0].value;
   let selected_value = $("#category-selector")[0].value;
   let description = $("#project-description")[0].value;
-  console.log(description);
   let registry_category = CATEGORIES[selected_value];
-  console.log(registry_category);
-
   if (project_name_regex.test(project)) {
     $('#valid p').text("");
     $('#inputName').removeClass("input-error")
@@ -313,14 +345,11 @@ function createNewProject() {
 
     fileSystem.createFolder(fileSystem.projects, project, project =>
       fileSystem.createFile(project, "config.json", configFile =>
-        fileSystem.writeToFile(configFile, JSON.stringify(json), () => {
-        })));
-
+        fileSystem.writeToFile(configFile, JSON.stringify(json), () => {})
+        ));
 
     addProjectRow(project, registry_category, description);
-    //$("#existing-projects").append($("<p>" + addProjectRow(project) + "</p>"));
     $('#inputName').val('');
-
     $('#newProjectModal').modal('toggle');
   }
   else{
@@ -328,7 +357,208 @@ function createNewProject() {
   }
 }
 
-// Esto ejecuta la acción del input del modal para agregar un nuevo proyecto.
+$(document).on('shown.bs.modal', '#newProjectModal', function () {
+  categories_setup(CATEGORIES);
+});
+
+
+function startProjectAuto(name){
+
+  fileSystem.getFolder(fileSystem.projects, name, project =>
+    fileSystem.getFile(project, "config.json", configFile =>
+      fileSystem.readFromFile(configFile, text => {
+        var cfg = JSON.parse(text);
+        cfg.RESULTS_ENABLED = !(cfg.RESULTS_DISABLED)
+        var url = "app.html?base_uri={BASE_FOLDER_NAME}&"+
+                                        "model="+name+"&"+
+                                        "debug={ENABLE_TIME_LOG}&"+
+                                        "results={RESULTS_ENABLED}&"+
+                                        "standalone=true";
+        url = url.formatUnicorn(cfg);
+
+        window.location.href = url
+      })));
+}
+
+
+// function automaticAddProjects() {
+//     // Definir una lista vacía para almacenar los nombres de los proyectos
+//   let actuales_proyectos = [];
+
+//   // Obtener los elementos dentro de la carpeta "projects"
+//   fileSystem.ls(fileSystem.projects, function(files) {
+//     // Iterar sobre los elementos y agregar los nombres de los proyectos a la lista
+//     for(let i=0; i<files.length; i++){
+//       let file=files[i];
+//       if(file.isDirectory){
+//         actuales_proyectos.push(file.name);
+//       }
+//     }
+//     console.log(actuales_proyectos); // Imprimir la lista de proyectos
+//   });
+//   let Listproject = ["caso_8", "PLP20230104"];
+//   let description = "";
+//   let registry_category = CATEGORIES[1];
+
+//   for (let project of Listproject) {
+//     if (actuales_proyectos.includes(project)){
+      
+//     }
+//     else{
+//       if (project_name_regex.test(project)) {
+//         let json = {
+//           BASE_FOLDER_NAME: "",
+//           MODEL_FOLDER_NAME: "",
+//           SIMULATION_FOLDER_NAME: "",
+//           AGGREGATE_GENERATORS_ENABLED: false,
+//           ENABLE_TIME_LOG: false,
+//           RESULTS_DISABLED: false,
+//           CATEGORY: registry_category,
+//           USER: "Publico",
+//           DESCRIPTION: description,
+//         };
+//         currentProjectName = project;
+  
+//         fileSystem.createFolder(fileSystem.projects, project, (project) =>
+//           fileSystem.createFile(project, "config.json", (configFile) =>
+//             fileSystem.writeToFile(configFile, JSON.stringify(json), () => {
+//               fileSystem.getFolder(fileSystem.projects, project.name, (project) =>
+//                 fileSystem.getFile(project, "config.json", (configFile) =>
+//                   fileSystem.readFromFile(configFile, (text) => {
+                
+                    
+//                     currentJsonProject = JSON.parse(text);
+//                     $('#ruta-proyecto').val(currentJsonProject.BASE_FOLDER_NAME + currentJsonProject.MODEL_FOLDER_NAME);
+//                     let rutaProyecto = project.name;
+//                     if (
+//                       rutaProyecto !== "" &&
+//                       verifyPathAccordingToOS(rutaProyecto)
+//                     ) {
+                    
+//                       savePath(rutaProyecto, "proyecto");
+  
+//                       currentJsonProject.RESULTS_DISABLED = false;
+//                       currentJsonProject.ENABLE_TIME_LOG = false;
+  
+//                       fileSystem.getFolder(
+//                         fileSystem.projects,
+//                         currentProjectName,
+//                         (project) =>
+//                           fileSystem.getFile(project, "config.json", (configFile) =>
+//                             fileSystem.writeToFile(
+//                               configFile,
+//                               JSON.stringify(currentJsonProject),
+//                               () => {}
+//                             )
+//                           )
+//                       );
+//                     }
+//                   })
+//                 )
+//               );
+//             })
+//           )
+//         );
+  
+//         addProjectRow(project, registry_category, description,true);
+        
+    
+  
+//       } else {
+//         $("#inputName").addClass("input-error");
+//       }
+//     }
+//   }
+// }
+
+function automaticAddProjects() {
+  // Definir una lista vacía para almacenar los nombres de los proyectos
+  let actuales_proyectos = [];
+
+  // Obtener los elementos dentro de la carpeta "projects"
+  fileSystem.ls(fileSystem.projects, function(files) {
+    // Iterar sobre los elementos y agregar los nombres de los proyectos a la lista
+    for(let i=0; i<files.length; i++){
+      let file=files[i];
+      if(file.isDirectory){
+        actuales_proyectos.push(file.name);
+      }
+    }
+    console.log(actuales_proyectos); // Imprimir la lista de proyectos
+
+    let Listproject = ["caso_8", "PLP20230104"];
+    let description = "";
+    let registry_category = CATEGORIES[1];
+
+    for (let project of Listproject) {
+      if (actuales_proyectos.includes(project)){
+      
+      }
+      else{
+        if (project_name_regex.test(project)) {
+          let json = {
+            BASE_FOLDER_NAME: "",
+            MODEL_FOLDER_NAME: "",
+            SIMULATION_FOLDER_NAME: "",
+            AGGREGATE_GENERATORS_ENABLED: false,
+            ENABLE_TIME_LOG: false,
+            RESULTS_DISABLED: false,
+            CATEGORY: registry_category,
+            USER: "Publico",
+            DESCRIPTION: description,
+          };
+          currentProjectName = project;
+
+          fileSystem.createFolder(fileSystem.projects, project, (project) =>
+            fileSystem.createFile(project, "config.json", (configFile) =>
+              fileSystem.writeToFile(configFile, JSON.stringify(json), () => {
+                fileSystem.getFolder(fileSystem.projects, project.name, (project) =>
+                  fileSystem.getFile(project, "config.json", (configFile) =>
+                    fileSystem.readFromFile(configFile, (text) => {
+
+                      currentJsonProject = JSON.parse(text);
+                      $('#ruta-proyecto').val(currentJsonProject.BASE_FOLDER_NAME + currentJsonProject.MODEL_FOLDER_NAME);
+                      let rutaProyecto = project.name;
+                      if (
+                        rutaProyecto !== "" &&
+                        verifyPathAccordingToOS(rutaProyecto)
+                      ) {
+
+                        savePath(rutaProyecto, "proyecto");
+
+                        currentJsonProject.RESULTS_DISABLED = false;
+                        currentJsonProject.ENABLE_TIME_LOG = false;
+
+                        fileSystem.getFolder(
+                          fileSystem.projects,
+                          currentProjectName,
+                          (project) =>
+                            fileSystem.getFile(project, "config.json", (configFile) =>
+                              fileSystem.writeToFile(
+                                configFile,
+                                JSON.stringify(currentJsonProject),
+                                () => {}
+                              )
+                            )
+                        );
+                      }
+                    })
+                  )
+                );
+              })
+            )
+          );
+
+          addProjectRow(project, registry_category, description,true);
+
+        } else {
+          $("#inputName").addClass("input-error");
+        }
+      }
+    }
+  });
+}
+
 $(function(e){
   // Al apretar una tecla en la ventana emergente se ejecuta esta acción.
   $('#aboutModal').keypress(function(e) {
@@ -337,7 +567,15 @@ $(function(e){
     }
   })
 });
-
+window.addEventListener('beforeunload', function() {
+	fileSystem.ls(fileSystem.projects, function(files) {
+	  for (let i = 0; i < files.length; i++) {
+		fileSystem.remove(files[i], function() {
+		  console.log("Se ha eliminado el archivo " + files[i].name);
+		});
+	  }
+	});
+  });
 $('#inputName').on("input",(event) =>
   {
     var input_content = event.target.value;
@@ -358,7 +596,7 @@ $('#ruta-proyecto').on("input",(event) =>
     }
   });
 
-let CATEGORIES = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5", "Category 6", "Category 7", "Category 8", "Category 9"];
+let CATEGORIES = ["Category 1", "Casos PLP", "Category 3", "Category 4", "Category 5", "Category 6", "Category 7", "Category 8", "Category 9"];
 let CATEGORIES_COLORS = [];
 
 function categories_setup(categories){
@@ -398,3 +636,6 @@ function categories_setup(categories){
   let selector = $('<select class="form-control" name="category-selector" id="category-selector">{html}</select>'.formatUnicorn({html: html_selector_categories}));
   labels_div.append(selector);
 }
+
+
+
