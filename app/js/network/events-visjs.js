@@ -361,7 +361,7 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
 
       // En caso de tener activada la animación.
       if ($("#animation-enabled")[0].checked) {
-
+        // console.log("pasando por iff de events-visjs")
         // Variables necesarias para determinar la posición del círculo(corriente) en cada arco.
         let iedge;
         let nodePosition = network.getPositions();
@@ -371,22 +371,50 @@ function addTriggerEvents(network, topologyType, nodes, edges) {
         let timeDelta = getCurrentTime() - lastUpdateTime;
 
         // En caso de que no haya pasado tiempo o no necesite de la animación retornamos.
-        if (timeDelta === 0 || currentTopologyType === TOPOLOGY_TYPES.HYDRIC) return;
+        if (timeDelta === 0 || currentTopologyType === TOPOLOGY_TYPES.HYDRIC){
+          console.log("se entro a timedelta === 0");
+           return;}
+        
 
+        function lineTimeCallback(x, id) {
+          return function() {
+            if (x.readyState === 4){
+              hydrologyTimes[chosenHydrology].lines[id] = JSON.parse(x.responseText);
+            }
+          };
+        }
+          
         // Se itera sobre todas las aristas para dibujar el círculo que representa la corriente si es necesario.
         for (iedge = 0; iedge < arrayLength; iedge++) {
-
+          
           let currentEdge = edgesArray[iedge];
+          
           // No neceistamos corriente desde una central (no hay datos de esto.)
           if (currentEdge.category.localeCompare('central-to-bus') === 0) continue;
 
           let currentLineTime = { flow: 0 };
+          
+          checkHydrologyTimes(chosenHydrology);
+          if(!(currentEdge.lineNumber in hydrologyTimes[chosenHydrology].lines)) {
+            try {
+              let chartReq = new XMLHttpRequest();
+              chartReq.onreadystatechange = lineTimeCallback(chartReq, currentEdge.lineNumber);
+              chartReq.open("GET", CONFIG.LINES_FOLDER + "line_" + currentEdge.lineNumber + ".json", false);
+              chartReq.send();
+            } catch (e) {
+              console.log("--------------------------------------------")
+              console.log("La línea: " + currentEdge.lineNumber + " no tiene archivo de resultados.")
+            }
+          }
 
           // Verificar si se cargaron los datos. Si no hay datos asumimos corriente 0.
           if (currentEdge.lineNumber in hydrologyTimes[chosenHydrology].lines) {
-              currentLineTime = hydrologyTimes[chosenHydrology].lines[currentEdge.lineNumber][chosenTime];
+      
+            currentLineTime = hydrologyTimes[chosenHydrology].lines[currentEdge.lineNumber][chosenTime];
           }
-          if(typeof currentLineTime === 'undefined') continue;
+          if(typeof currentLineTime === 'undefined') {
+            console.log("tipo indefinido",currentEdge.lineNumber)
+            continue;}
           let flow = currentLineTime.flow;
           if(zero(currentLineTime.flow)) continue; // Si no hay corriente no dibujamos nada.
 

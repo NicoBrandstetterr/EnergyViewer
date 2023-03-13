@@ -97,15 +97,15 @@ console.log("indhor: ",indhor);
                   ticks: {
                     beginAtZero: true
                   },
-                  scaleLabel: {
+                  title: {
                     display: true,
-                    labelString: lblStrY
+                    text: lblStrY
                   }
                 },
                 x: {
-                  scaleLabel: {
+                  title: {
                     display: true,
-                    labelString: lblStrX
+                    text: lblStrX
                   },
                   ticks: {
                     beginAtZero: true,

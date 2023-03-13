@@ -440,7 +440,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(33, 33, 33, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               },
               {
                   label: "Perc20",
@@ -450,7 +450,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(255, 0, 0, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               },
               {
                   label: "Perc80",
@@ -460,7 +460,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(0, 255, 0, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               },
               {
                   label: "Perc100",
@@ -470,7 +470,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(0, 0, 255, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               },
               {
                 label: "Min",
@@ -559,15 +559,15 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   ticks: {
                     beginAtZero: true
                   },
-                  scaleLabel: {
+                  title: {
                     display: true,
-                    labelString: labelStrY
+                    text: labelStrY
                   }
                 },
                 x: {
-                  scaleLabel: {
+                  title: {
                     display: true,
-                    labelString: labelStrX
+                    text: labelStrX
                   },
                   ticks: {
                     beginAtZero: true,
@@ -627,7 +627,6 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
           let perc_data = JSON.parse(this.responseText);
           // console.log("perc_Data: ",perc_data)
           // console.log("perc_Data type: ",typeof perc_data)
-  
           // Inicia simil con setUpSingleDATA
           let perc0 = [], perc20 = [], perc80 = [], perc100 = [], promedio = []
             let time = []
@@ -654,7 +653,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(33, 33, 33, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               },
               {
                   label: "Perc20",
@@ -664,7 +663,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(255, 0, 0, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               },
               {
                   label: "Perc80",
@@ -674,7 +673,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(0, 255, 0, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               },
               {
                   label: "Perc100",
@@ -684,7 +683,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(0, 0, 255, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               },
               {
                   label: "Promedio",
@@ -694,7 +693,7 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   pointBackgroundColor: 'rgba(255, 193, 7, 1)',
                   borderWidth: 1,
                   pointRadius: 0,
-                  fill: true
+                  fill: false
               }
           ]
           };
@@ -764,15 +763,17 @@ function percentilGraph(canvas,selectedElement,type,PDTO,elementObject) {
                   ticks: {
                     beginAtZero: true
                   },
-                  scaleLabel: {
+
+                  title: {
                     display: true,
-                    labelString: labelStrY
-                  }
+                    text: labelStrY
+                  },
                 },
                 x: {
-                  scaleLabel: {
+
+                  title: {
                     display: true,
-                    labelString: labelStrX
+                    text: labelStrX
                   },
                   ticks: {
                     beginAtZero: true,

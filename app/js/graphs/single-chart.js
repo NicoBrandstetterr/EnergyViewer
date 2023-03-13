@@ -304,15 +304,16 @@ requestindhor.send();
             ticks: {
               beginAtZero: true
             },
-            scaleLabel: {
+            
+            title: {
               display: true,
-              labelString: labelStrY
+              text: labelStrY
             }
           },
           x: {
-            scaleLabel: {
+            title: {
               display: true,
-              labelString: labelStrX
+              text: labelStrX
             },
             ticks: {
               beginAtZero: true,
@@ -472,15 +473,15 @@ requestindhor.send();
             ticks: {
               beginAtZero: true
             },
-            scaleLabel: {
+            title: {
               display: true,
-              labelString: labelStrY
+              text: labelStrY
             }
           },
           x: {
-            scaleLabel: {
+            title: {
               display: true,
-              labelString: labelStrX
+              text: labelStrX
             },
             ticks: {
               beginAtZero: true,
